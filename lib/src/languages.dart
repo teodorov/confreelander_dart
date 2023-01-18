@@ -1,3 +1,5 @@
+import 'package:collection/collection.dart';
+
 abstract class Language {
   const Language();
   bool includes(Iterator it) {
@@ -62,6 +64,15 @@ class Epsilon extends Terminal {
 
   @override
   String toString() => 'ε';
+
+  @override
+  int get hashCode => Object.hash(runtimeType, SetEquality().hash(trees));
+
+  @override
+  bool operator ==(Object other) {
+    return super == other ||
+        (other is Epsilon && SetEquality().equals(trees, other.trees));
+  }
 }
 
 class Token extends Terminal {
@@ -79,6 +90,14 @@ class Token extends Terminal {
 
   @override
   String toString() => 'Token($token)';
+
+  @override
+  int get hashCode => Object.hash(runtimeType, token);
+
+  @override
+  bool operator ==(Object other) {
+    return super == other || (other is Token && token == other.token);
+  }
 }
 
 /// A composite parser encapsulates at least another parser
@@ -117,6 +136,15 @@ class Union extends Composite {
 
   @override
   String toString() => '$lhs | $rhs';
+
+  @override
+  int get hashCode => Object.hash(runtimeType, lhs, rhs);
+
+  @override
+  bool operator ==(Object other) {
+    return super == other ||
+        (other is Union && lhs == other.lhs && rhs == other.rhs);
+  }
 }
 
 class Concatenation extends Composite {
@@ -146,6 +174,15 @@ class Concatenation extends Composite {
 
   @override
   String toString() => '$lhs ∘ $rhs';
+
+  @override
+  int get hashCode => Object.hash(runtimeType, lhs, rhs);
+
+  @override
+  bool operator ==(Object other) {
+    return super == other ||
+        (other is Concatenation && lhs == other.lhs && rhs == other.rhs);
+  }
 }
 
 class Star extends Composite {
@@ -163,6 +200,14 @@ class Star extends Composite {
 
   @override
   String toString() => '$operand*';
+
+  @override
+  int get hashCode => Object.hash(runtimeType, operand);
+
+  @override
+  bool operator ==(Object other) {
+    return super == other || (other is Star && operand == other.operand);
+  }
 }
 
 class Delta extends Composite {
@@ -179,6 +224,14 @@ class Delta extends Composite {
 
   @override
   String toString() => 'δ($operand)';
+
+  @override
+  int get hashCode => Object.hash(runtimeType, operand);
+
+  @override
+  bool operator ==(Object other) {
+    return super == other || (other is Delta && operand == other.operand);
+  }
 }
 
 class Projection extends Composite {
@@ -198,6 +251,17 @@ class Projection extends Composite {
 
   @override
   String toString() => '$operand >> $projector';
+
+  @override
+  int get hashCode => Object.hash(runtimeType, operand, projector);
+
+  @override
+  bool operator ==(Object other) {
+    return super == other ||
+        (other is Projection &&
+            operand == other.operand &&
+            projector == other.projector);
+  }
 }
 
 class Reference extends Composite {
@@ -214,6 +278,14 @@ class Reference extends Composite {
 
   @override
   String toString() => 'ref($target)';
+
+  @override
+  int get hashCode => Object.hash(runtimeType, target);
+
+  @override
+  bool operator ==(Object other) {
+    return super == other || (other is Reference && target == other.target);
+  }
 }
 
 class Delayed extends Language {
@@ -234,4 +306,13 @@ class Delayed extends Language {
   String toString() => 'delayed($operand, $token)';
 
   force() => operand.derive(token);
+
+  @override
+  int get hashCode => Object.hash(runtimeType, operand, token);
+
+  @override
+  bool operator ==(Object other) {
+    return super == other ||
+        (other is Delayed && operand == other.operand && token == other.token);
+  }
 }
