@@ -1,4 +1,5 @@
 abstract class Language {
+  const Language();
   bool includes(Iterator it) {
     if (!it.moveNext()) return isNullable();
     return derive(it.current).includes(it);
@@ -9,49 +10,18 @@ abstract class Language {
     return derive(it.current).parse(it);
   }
 
-  empty() => Empty();
-
-  eps() => Epsilon();
-
-  epsToken(Object token) => Epsilon.token(token);
-
-  epsTrees(Set trees) {
-    if (trees.isEmpty) return empty();
-    if (trees.length == 1 && trees.contains(empty())) return empty();
-    return Epsilon.trees(trees);
-  }
-
-  tok(Object o) => Token(o);
-
-  operator |(Language other) {
-    if (this == empty()) return other;
-    if (other == empty()) return this;
-    return Union(this, other);
-  }
-
-  concatenation(Language other) {
-    if (this == empty() || other == empty()) return empty();
-    return Concatenation(this, other);
-  }
-
-  star() => this is Star ? this : Star(this);
-
-  delta() => Delta(this);
-
-  operator >>(Function projector) => Projection(this, projector);
-
-  ref() => Reference(this);
-
   Language derive(Object token);
   Set parseTrees();
   bool isNullable();
 }
 
 /// a Terminal parser does not contain sub-parsers
-abstract class Terminal extends Language {}
+abstract class Terminal extends Language {
+  const Terminal();
+}
 
 class Empty extends Terminal {
-  Empty._create();
+  const Empty._create();
   static final Empty emptyI = Empty._create();
   factory Empty() => emptyI;
 
@@ -216,7 +186,8 @@ class Projection extends Composite {
   Language operand;
   Function projector;
   @override
-  Language xderive(Object token) => operand.derive(token) >> projector;
+  Language xderive(Object token) =>
+      Projection(operand.derive(token), projector);
 
   @override
   Set xparseTrees() =>
