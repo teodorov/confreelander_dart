@@ -104,7 +104,7 @@ void main() {
     test('reference', () {
       expect(identical(ref(empty), empty), true);
       expect(ref(token(2)), isA<Reference>());
-      expect(ref(token(2)).target, isA<Token>());
+      expect((ref(token(2)) as Reference).target, isA<Token>());
     });
     test('', () {});
   });
