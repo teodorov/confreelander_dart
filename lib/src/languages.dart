@@ -12,6 +12,8 @@ abstract class Language {
     return derive(it.current).parse(it);
   }
 
+  get isEmpty => this == Empty();
+
   Language derive(Object token);
   Set parseTrees();
   bool isNullable();
@@ -138,12 +140,16 @@ class Union extends Composite {
   String toString() => '$lhs | $rhs';
 
   @override
-  int get hashCode => Object.hash(runtimeType, lhs, rhs);
+  int get hashCode => lhs.isEmpty
+      ? rhs.hashCode
+      : (rhs.isEmpty ? lhs.hashCode : Object.hash(runtimeType, lhs, rhs));
 
   @override
   bool operator ==(Object other) {
     return super == other ||
-        (other is Union && lhs == other.lhs && rhs == other.rhs);
+        (other is Union && lhs == other.lhs && rhs == other.rhs) ||
+        (lhs.isEmpty && rhs == other) ||
+        (rhs.isEmpty && lhs == other);
   }
 }
 
@@ -176,12 +182,15 @@ class Concatenation extends Composite {
   String toString() => '$lhs ∘ $rhs';
 
   @override
-  int get hashCode => Object.hash(runtimeType, lhs, rhs);
+  int get hashCode => lhs.isEmpty || rhs.isEmpty
+      ? Empty().hashCode
+      : Object.hash(runtimeType, lhs, rhs);
 
   @override
   bool operator ==(Object other) {
     return super == other ||
-        (other is Concatenation && lhs == other.lhs && rhs == other.rhs);
+        (other is Concatenation && lhs == other.lhs && rhs == other.rhs) ||
+        ((lhs.isEmpty || rhs.isEmpty) && (other as Language).isEmpty);
   }
 }
 

@@ -12,41 +12,31 @@ Language epsTrees(Set trees) {
 }
 
 Language token(Object o) => Token(o);
-ref(Language o) => o == empty ? empty : Reference(o);
+Language ref(Language o) => o == empty ? empty : Reference(o);
 
 extension SmartConstructors on Language {
-  empty() => Empty();
-
-  eps() => Epsilon();
-
-  epsToken(Object token) => Epsilon.token(token);
-
-  epsTrees(Set trees) {
-    if (trees.isEmpty) return empty();
-    if (trees.length == 1 && trees.contains(empty())) return empty();
-    return Epsilon.trees(trees);
-  }
-
-  token(Object o) => Token(o);
-
-  operator |(Language other) {
-    if (this == empty()) return other;
-    if (other == empty()) return this;
+  Language operator |(Language other) {
+    if (isEmpty) return other;
+    if (other.isEmpty) return this;
     return Union(this, other);
   }
 
-  concatenation(Language other) {
-    if (this == empty() || other == empty()) return empty();
+  Language concatenation(Language other) {
+    if (isEmpty || other.isEmpty) return empty;
     return Concatenation(this, other);
   }
 
-  star() => this is Star ? this : Star(this);
+  Language seq(Language other) {
+    return concatenation(other);
+  }
 
-  delta() => Delta(this);
+  Language get star => this is Star ? this : Star(this);
 
-  operator >>(Function projector) => Projection(this, projector);
+  Language get delta => Delta(this);
 
-  ref() => Reference(this);
+  Language operator >>(Function projector) => Projection(this, projector);
+
+  Language get ref => Reference(this);
 }
 
 extension ConFreeLanDer on Object {
