@@ -19,9 +19,9 @@ void main() {
 
     test('D union', () {
       var lang = token('a') | token('b');
-      expect(lang.derive('a'), Union(epsToken('a'), empty));
-      expect(lang.derive('b'), Union(empty, epsToken('b')));
-      expect(lang.derive('c'), Union(empty, empty));
+      expect(lang.derive('a'), epsToken('a'));
+      expect(lang.derive('b'), epsToken('b'));
+      expect(lang.derive('c'), empty);
     });
 
     test('D union smart eq', () {
@@ -33,16 +33,19 @@ void main() {
 
     test('D concat', () {
       var lang = token('a').seq(token('b'));
+      //use compare the toString representations because projections
+      //do not work with structural equality
       expect(
-          token('a').delta.seq(token('b').derive('a')) |
-              epsToken('a').seq(token('b')),
-          lang.derive('a'));
+          (lang.derive('a')).toString(),
+          (token('a').delta.seq(token('b').derive('a')) |
+                  epsToken('a').seq(token('b')))
+              .toString());
       lang = token('a').star.seq(token('b'));
       expect(
-        token('a').star.delta.seq(token('b').derive('b')) |
-            empty.seq(token('a')).seq(token('b')),
-        lang.derive('b'),
-      );
+          lang.derive('b').toString(),
+          (token('a').star.delta.seq(token('b').derive('b')) |
+                  empty.seq(token('a')).seq(token('b')))
+              .toString());
     });
 
     test('D delta', () {
@@ -65,7 +68,42 @@ void main() {
 
     test('D delayed a∘b equals', () {
       var lang = token('a').concatenation(token('b'));
-      expect(Delayed(lang, 'a').derive('b'), lang.derive('a').derive('b'));
+      expect(lang.delayed('a').derive('b'), lang.derive('a').derive('b'));
+    });
+
+    test('ref', () {
+      var rS = ref('S');
+      var S = token('a') | rS;
+      rS.target = S;
+
+      var rS1 = ref('S');
+      // ignore: non_constant_identifier_names
+      var S1 = token('a') | rS1;
+      rS1.target = S1;
+
+      expect(rS.hashCode == rS1.hashCode, true);
+      expect(S.hashCode == S1.hashCode, true);
+
+      //expect(S.derive('a'), epsToken('a') | S);
+    });
+
+    test('S = a | S =a=> ϵ | S', () {
+      var rS = ref('S');
+      var S = token('a') | rS;
+      rS.target = S;
+
+      expect(S.derive('a'), epsToken('a') | (token('a') | rS).delayed('a'));
+      // expect(S.derive('a').derive('a'),
+      //     epsToken('a') | (token('a') | rS).delayed('a'));
+    });
+
+    test('S = a | S =a=> =a=>', () {
+      var rS = ref('S');
+      var S = token('a') | rS;
+      rS.target = S;
+
+      expect(S.derive('a').derive('a'),
+          epsToken('a') | (token('a') | rS).delayed('a'));
     });
   });
 }

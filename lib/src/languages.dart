@@ -1,9 +1,11 @@
 import 'package:collection/collection.dart';
+import 'smart_constructors.dart';
 
 abstract class Language {
   const Language();
+
   bool includes(Iterator it) {
-    if (!it.moveNext()) return isNullable();
+    if (!it.moveNext()) return isNullable;
     return derive(it.current).includes(it);
   }
 
@@ -12,11 +14,11 @@ abstract class Language {
     return derive(it.current).parse(it);
   }
 
-  get isEmpty => this == Empty();
+  get isEmpty => this == empty;
 
   Language derive(Object token);
   Set parseTrees();
-  bool isNullable();
+  bool get isNullable;
 }
 
 /// a Terminal parser does not contain sub-parsers
@@ -26,24 +28,25 @@ abstract class Terminal extends Language {
 
 class Empty extends Terminal {
   const Empty._create();
-  static final Empty emptyI = Empty._create();
+  static const Empty emptyI = Empty._create();
   factory Empty() => emptyI;
 
   @override
-  Language derive(Object token) => Empty();
+  Language derive(Object token) => empty;
 
+  //incomplete parse, the set of parse trees is empty
   @override
   Set parseTrees() => {};
 
   @override
-  bool isNullable() => false;
+  bool get isNullable => false;
 
   @override
   String toString() => '∅';
 }
 
 class Epsilon extends Terminal {
-  Set trees = {};
+  final Set trees = {};
 
   Epsilon() {
     trees.add(Empty());
@@ -56,39 +59,43 @@ class Epsilon extends Terminal {
   }
 
   @override
-  Language derive(Object token) => Empty();
+  Language derive(Object token) => empty;
 
+  //a complete parse, return the set of parse trees
   @override
   Set parseTrees() => trees;
 
   @override
-  bool isNullable() => true;
+  bool get isNullable => true;
 
   @override
   String toString() => 'ε';
 
   @override
-  int get hashCode => Object.hash(runtimeType, SetEquality().hash(trees));
+  int get hashCode =>
+      Object.hash(runtimeType, DeepCollectionEquality().hash(trees));
 
   @override
   bool operator ==(Object other) {
     return super == other ||
-        (other is Epsilon && SetEquality().equals(trees, other.trees));
+        (other is Epsilon &&
+            DeepCollectionEquality().equals(trees, other.trees));
   }
 }
 
 class Token extends Terminal {
   Token(this.token);
-  Object token;
+  final Object token;
   @override
   Language derive(Object token) =>
-      this.token == token ? Epsilon.token(this.token) : Empty();
+      this.token == token ? epsToken(this.token) : empty;
 
+  //incomplete parse, the set of parse trees is empty
   @override
   Set parseTrees() => {};
 
   @override
-  bool isNullable() => false;
+  bool get isNullable => false;
 
   @override
   String toString() => 'Token($token)';
@@ -103,66 +110,44 @@ class Token extends Terminal {
 }
 
 /// A composite parser encapsulates at least another parser
-abstract class Composite extends Language {
-  xderive(Object token);
-  xparseTrees();
-  xisNullable();
-
-  @override
-  Language derive(Object token) {
-    return xderive(token);
-  }
-
-  @override
-  Set parseTrees() {
-    return xparseTrees();
-  }
-
-  @override
-  bool isNullable() {
-    return xisNullable();
-  }
-}
+abstract class Composite extends Language {}
 
 class Union extends Composite {
   Union(this.lhs, this.rhs);
-  Language lhs, rhs;
+  final Language lhs, rhs;
   @override
-  Language xderive(Object token) => Union(lhs.derive(token), rhs.derive(token));
+  Language derive(Object token) => lhs.derive(token) | rhs.derive(token);
+
+  //union the results from their children
+  @override
+  Set parseTrees() => lhs.parseTrees().union(rhs.parseTrees());
 
   @override
-  Set xparseTrees() => lhs.parseTrees().union(rhs.parseTrees());
-
-  @override
-  bool xisNullable() => lhs.isNullable() || rhs.isNullable();
+  bool get isNullable => lhs.isNullable || rhs.isNullable;
 
   @override
   String toString() => '$lhs | $rhs';
 
   @override
-  int get hashCode => lhs.isEmpty
-      ? rhs.hashCode
-      : (rhs.isEmpty ? lhs.hashCode : Object.hash(runtimeType, lhs, rhs));
+  int get hashCode => Object.hash(runtimeType, lhs, rhs);
 
   @override
   bool operator ==(Object other) {
     return super == other ||
-        (other is Union && lhs == other.lhs && rhs == other.rhs) ||
-        (lhs.isEmpty && rhs == other) ||
-        (rhs.isEmpty && lhs == other);
+        (other is Union && lhs == other.lhs && rhs == other.rhs);
   }
 }
 
 class Concatenation extends Composite {
   Concatenation(this.lhs, this.rhs);
-  Language lhs, rhs;
+  final Language lhs, rhs;
   @override
-  Language xderive(Object token) => Union(
-      Concatenation(Delta(lhs), rhs.derive(token)),
-      Concatenation(lhs.derive(token), rhs));
+  Language derive(Object token) =>
+      lhs.delta.seq(rhs.derive(token)) | lhs.derive(token).seq(rhs);
 
+  //Concatenation nodes construct pairs of elements from their children
   @override
-  Set xparseTrees() {
+  Set parseTrees() {
     Set lhsTrees = lhs.parseTrees();
     Set rhsTrees = lhs.parseTrees();
 
@@ -176,36 +161,34 @@ class Concatenation extends Composite {
   }
 
   @override
-  bool xisNullable() => lhs.isNullable() && rhs.isNullable();
+  bool get isNullable => lhs.isNullable && rhs.isNullable;
 
   @override
   String toString() => '$lhs ∘ $rhs';
 
   @override
-  int get hashCode => lhs.isEmpty || rhs.isEmpty
-      ? Empty().hashCode
-      : Object.hash(runtimeType, lhs, rhs);
+  int get hashCode {
+    return Object.hash(runtimeType, lhs, rhs);
+  }
 
   @override
   bool operator ==(Object other) {
     return super == other ||
-        (other is Concatenation && lhs == other.lhs && rhs == other.rhs) ||
-        ((lhs.isEmpty || rhs.isEmpty) && (other as Language).isEmpty);
+        (other is Concatenation && lhs == other.lhs && rhs == other.rhs);
   }
 }
 
 class Star extends Composite {
   Star(this.operand);
-  Language operand;
+  final Language operand;
   @override
-  Language xderive(Object token) =>
-      Concatenation(operand.derive(token), operand);
+  Language derive(Object token) => operand.derive(token).seq(operand);
 
   @override
-  Set xparseTrees() => {null};
+  Set parseTrees() => {null};
 
   @override
-  bool xisNullable() => true;
+  bool get isNullable => true;
 
   @override
   String toString() => '$operand*';
@@ -221,15 +204,15 @@ class Star extends Composite {
 
 class Delta extends Composite {
   Delta(this.operand);
-  Language operand;
+  final Language operand;
   @override
-  Language xderive(Object token) => Empty();
+  Language derive(Object token) => empty;
 
   @override
-  Set xparseTrees() => operand.parseTrees();
+  Set parseTrees() => operand.parseTrees();
 
   @override
-  bool xisNullable() => operand.isNullable();
+  bool get isNullable => operand.isNullable;
 
   @override
   String toString() => 'δ($operand)';
@@ -245,22 +228,23 @@ class Delta extends Composite {
 
 class Projection extends Composite {
   Projection(this.operand, this.projector);
-  Language operand;
-  Function projector;
+  final Language operand;
+  final Function projector;
   @override
-  Language xderive(Object token) =>
-      Projection(operand.derive(token), projector);
+  Language derive(Object token) => operand.derive(token) >> projector;
 
+  //Projections apply their function to the result of their child
   @override
-  Set xparseTrees() =>
+  Set parseTrees() =>
       operand.parseTrees().fold({}, (pV, tree) => pV.union(projector(tree)));
 
   @override
-  bool xisNullable() => operand.isNullable();
+  bool get isNullable => operand.isNullable;
 
   @override
   String toString() => '$operand >> $projector';
 
+  //NB: cannot rely on dart function equality
   @override
   int get hashCode => Object.hash(runtimeType, operand, projector);
 
@@ -274,33 +258,69 @@ class Projection extends Composite {
 }
 
 class Reference extends Composite {
-  Reference(this.target);
+  Reference(this.name, [this.target = Empty.emptyI]);
+  final String name;
   Language target;
-  @override
-  Language xderive(Object token) => target.derive(token);
+  set setTarget(Language target) {
+    this.target = target;
+  }
+
+  Language? cachedDerivative;
+  Object? cachedToken;
+  Set? cachedParseTrees;
+  bool? cachedIsNullable;
+  int? cachedHashCode;
 
   @override
-  Set xparseTrees() => target.parseTrees();
+  Language derive(Object token) {
+    if (cachedToken == null || cachedToken == token) {
+      if (cachedDerivative == null) {
+        return cachedDerivative ?? Delayed(target, token);
+      }
+
+      return (cachedDerivative as Delayed).derivative ?? cachedDerivative!;
+    }
+    cachedToken = token;
+    cachedDerivative = Delayed(target, token);
+    return cachedDerivative!;
+  }
 
   @override
-  bool xisNullable() => target.isNullable();
+  Set parseTrees() => cachedParseTrees ??= target.parseTrees();
 
   @override
-  String toString() => 'ref($target)';
+  bool get isNullable {
+    if (cachedIsNullable != null) return cachedIsNullable!;
+    cachedIsNullable = false;
+
+    cachedIsNullable = target.isNullable;
+    return cachedIsNullable!;
+  }
 
   @override
-  int get hashCode => Object.hash(runtimeType, target);
+  String toString() => 'ref($name)';
+
+  @override
+  int get hashCode {
+    if (cachedHashCode != null) return cachedHashCode!;
+    cachedHashCode = Object.hash(runtimeType, name);
+    var hash = target.hashCode;
+    cachedHashCode = Object.hash(cachedHashCode!, hash);
+    return cachedHashCode!;
+  }
 
   @override
   bool operator ==(Object other) {
-    return super == other || (other is Reference && target == other.target);
+    return super == other ||
+        (other is Reference && name == other.name && target == other.target);
   }
 }
 
 class Delayed extends Language {
   Delayed(this.operand, this.token);
-  Language operand;
-  Object token;
+  final Language operand;
+  final Object token;
+  Language? derivative;
 
   @override
   Language derive(Object token) => force().derive(token);
@@ -309,12 +329,12 @@ class Delayed extends Language {
   Set parseTrees() => force().parseTrees();
 
   @override
-  bool isNullable() => force().isNullable();
+  bool get isNullable => force().isNullable;
 
   @override
   String toString() => 'delayed($operand, $token)';
 
-  force() => operand.derive(token);
+  Language force() => derivative ??= operand.derive(token);
 
   @override
   int get hashCode => Object.hash(runtimeType, operand, token);

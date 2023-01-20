@@ -43,7 +43,7 @@ void main() {
     });
 
     test('print Reference', () {
-      expect(Reference(Token('x')).toString(), equals('ref(Token(x))'));
+      expect(Reference('y', Token('x')).toString(), equals('ref(y)'));
     });
 
     test('print Delayed', () {
@@ -87,9 +87,9 @@ void main() {
       expect(a.parseTrees(), equals({'to'}));
 
       b = epsTrees({});
-      expect(identical(b, empty), true);
+      expect(identical(b, empty), false);
       b = epsTrees({empty});
-      expect(identical(b, empty), true);
+      expect(identical(b, empty), false);
       b = epsTrees({
         {2},
         {'t'}
@@ -102,9 +102,9 @@ void main() {
           }));
     });
     test('reference', () {
-      expect(identical(ref(empty), empty), true);
-      expect(ref(token(2)), isA<Reference>());
-      expect((ref(token(2)) as Reference).target, isA<Token>());
+      expect(identical(empty.ref('r'), empty), true);
+      expect(token(2).ref('m'), isA<Reference>());
+      expect((token(2).ref('m') as Reference).target, isA<Token>());
     });
     test('', () {});
   });
