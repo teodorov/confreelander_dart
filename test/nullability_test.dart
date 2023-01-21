@@ -177,6 +177,18 @@ void main() {
       expect(rS.isNullable, true);
     });
 
+    test('self loop not nullable', () {
+      var rS = ref('S');
+      rS.target = rS;
+      expect(rS.isNullable, false);
+    });
+
+    test('derive self loop not nullable', () {
+      var rS = ref('S');
+      rS.target = rS;
+      expect(rS.derive('a').isNullable, false);
+    });
+
     test('', () {});
   });
 }

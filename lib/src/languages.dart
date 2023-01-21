@@ -272,14 +272,17 @@ class Reference extends Composite {
   bool? cachedIsNullable;
   int? cachedHashCode;
 
+  ///needs memoization since D S = D S
   @override
   Language derive(Object token) {
-    return Delayed(target, token);
+    return cachedDerivative ??= Delayed(target, token);
   }
 
   @override
   Set parseTrees() => cachedParseTrees ??= target.parseTrees();
 
+  ///needs fixed point & memoization
+  ///the idea is suppose false, and see if we can get through by traversing the target
   @override
   bool get isNullable {
     if (cachedIsNullable != null) return cachedIsNullable!;
@@ -292,6 +295,8 @@ class Reference extends Composite {
   @override
   String toString() => 'ref($name)';
 
+  //we cannot get fixedpoint here, because the ints are not a lattice
+  //but a hash based on the name and the target language hash should be good enough
   @override
   int get hashCode {
     if (cachedHashCode != null) return cachedHashCode!;
@@ -313,15 +318,25 @@ class Delayed extends Language {
   final Language operand;
   final Object token;
   Language? derivative;
+  bool? cachedIsNullable;
 
+  ///need memoization
   @override
   Language derive(Object token) => derivative ?? Delayed(this, token);
 
   @override
   Set parseTrees() => force().parseTrees();
 
+  ///needs fixed point & memoization
+  ///the idea is suppose false, and see if we can get through by traversing the forced language
   @override
-  bool get isNullable => force().isNullable;
+  bool get isNullable {
+    if (cachedIsNullable != null) return cachedIsNullable!;
+    cachedIsNullable = false;
+
+    cachedIsNullable = force().isNullable;
+    return cachedIsNullable!;
+  }
 
   @override
   String toString() => 'delayed($operand, $token)';

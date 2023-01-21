@@ -68,7 +68,8 @@ void main() {
 
     test('D delayed a∘b equals', () {
       var lang = token('a').concatenation(token('b'));
-      expect((lang.delayed('a').derive('b') as Delayed).force(), lang.derive('a').derive('b'));
+      expect((lang.delayed('a').derive('b') as Delayed).force(),
+          lang.derive('a').derive('b'));
     });
 
     test('ref', () {
@@ -105,6 +106,50 @@ void main() {
 
       expect(S.derive('a').derive('a'),
           (token('a') | rS).delayed('a').delayed('a'));
+    });
+
+    test('self loop', () {
+      var rS = ref('S');
+      rS.target = rS;
+      expect(rS.derive('a'), rS.delayed('a'));
+    });
+
+    test('derivative of (delayed self loop) is itself', () {
+      var rS = ref('S');
+
+      rS.target = rS;
+      var fixed = rS.delayed('a');
+      var rsd = rS.derive('a');
+      expect(rsd, fixed);
+      expect((rsd as Delayed).force(), fixed);
+      rsd = rsd.derive('a');
+      expect(rsd, fixed);
+      expect((rsd as Delayed).force(), fixed);
+      rsd = rsd.derive('a');
+      expect(rsd, fixed);
+      expect((rsd as Delayed).force(), fixed);
+    });
+
+    test('delay accumulates', () {
+      var rS = ref('S');
+      rS.target = rS;
+      var fixed = rS.delayed('a');
+      var rsd = rS.derive('a');
+      expect(rsd, fixed);
+      rsd = rsd.derive('a');
+      expect(rsd, fixed.derive('a'));
+      rsd = rsd.derive('a');
+      expect(rsd, fixed.delayed('a').delayed('a'));
+    });
+
+    test('force cleans accumulated delay', () {
+      var rS = ref('S');
+      rS.target = rS;
+      var fixed = rS.delayed('a');
+      var rsd = rS.derive('a');
+      rsd = rsd.derive('a');
+      rsd = rsd.derive('a');
+      expect((rsd as Delayed).force(), fixed);
     });
   });
 }
