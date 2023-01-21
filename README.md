@@ -62,3 +62,11 @@ p** ⟹ p*
 (ϵₛ ∘ p) >> f ⟹ p >> λu. f( (s, u) )
 (p >> f) >> g ⟹ p >> (g ◯ f)
 ```
+
+## Things that I don't like on the original article
+
+1. The derive function is polluted with information needed for parseTree construction.
+2. The cycles are direct
+   1. Here I use explicit reference nodes, which reify the back-edges
+3. Memoization for all composite nodes
+   1. let's start by doing it first where it is really needed only.
