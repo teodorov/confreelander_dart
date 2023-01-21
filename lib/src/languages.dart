@@ -10,8 +10,11 @@ abstract class Language {
     return derive(it.current).includes(it);
   }
 
+  ///A isNullable language accepts the empty word.
+  ///A word is included in a language if the last derivative in the series isNullable.
+  ///So if not nullable then no parseTree.
   Set parse(Iterator it) {
-    if (!it.moveNext()) return parseTrees();
+    if (!it.moveNext()) return isNullable ? parseTrees() : {};
     return derive(it.current).parse(it);
   }
 
@@ -279,18 +282,16 @@ class Reference extends Composite {
     this.target = target;
   }
 
-  Language? cachedDerivative;
+  Language? _derivative;
   Object? cachedToken;
   Set? cachedParseTrees;
-  bool? cachedIsNullable;
-  bool? cachedIsProductive;
-  int? cachedHashCode;
+  bool? _isNullable;
+  bool? _isProductive;
+  int? _hashCode;
 
   ///needs memoization since D S = D S
   @override
-  Language derive(Object token) {
-    return cachedDerivative ??= Delayed(target, token);
-  }
+  Language derive(Object token) => _derivative ??= Delayed(target, token);
 
   @override
   Set parseTrees() => cachedParseTrees ??= target.parseTrees();
@@ -298,20 +299,25 @@ class Reference extends Composite {
   ///needs fixed point & memoization
   ///the idea is suppose false, and see if we can get through by traversing the target
   @override
-  bool get isNullable {
-    if (cachedIsNullable != null) return cachedIsNullable!;
-    cachedIsNullable = false;
-
-    cachedIsNullable = target.isNullable;
-    return cachedIsNullable!;
+  bool get isNullable => _isNullable ??= _computeIsNullable();
+  bool _computeIsNullable() {
+    //suppose false, before traversing children
+    _isNullable = false;
+    var result = target.isNullable;
+    //clear the cache
+    _isNullable = null;
+    return result;
   }
 
   @override
-  bool get isProductive {
-    if (cachedIsProductive != null) return cachedIsProductive!;
-    cachedIsProductive = false;
-    cachedIsProductive = target.isProductive;
-    return cachedIsProductive!;
+  bool get isProductive => _isProductive ??= _computeIsProductive();
+  bool _computeIsProductive() {
+    //suppose false, before traversing children
+    _isProductive = false;
+    var result = target.isProductive;
+    //clear the cache
+    _isProductive = null;
+    return result;
   }
 
   @override
@@ -320,12 +326,17 @@ class Reference extends Composite {
   //we cannot get fixedpoint here, because the ints are not a lattice
   //but a hash based on the name and the target language hash should be good enough
   @override
-  int get hashCode {
-    if (cachedHashCode != null) return cachedHashCode!;
-    cachedHashCode = Object.hash(runtimeType, name);
+  int get hashCode => _hashCode ??= _computeHashCode();
+  int _computeHashCode() {
+    //the seed value
+    _hashCode = Object.hash(runtimeType, name);
+    //traverse children
     var hash = target.hashCode;
-    cachedHashCode = Object.hash(cachedHashCode!, hash);
-    return cachedHashCode!;
+    //integrate children hashcode
+    var result = Object.hash(runtimeType, name, hash);
+    //clear the cache
+    _hashCode = null;
+    return result;
   }
 
   @override
@@ -340,8 +351,8 @@ class Delayed extends Language {
   final Language operand;
   final Object token;
   Language? derivative;
-  bool? cachedIsNullable;
-  bool? cachedIsProductive;
+  bool? _isNullable;
+  bool? _isProductive;
 
   ///need memoization
   @override
@@ -353,19 +364,25 @@ class Delayed extends Language {
   ///needs fixed point & memoization
   ///the idea is suppose false, and see if we can get through by traversing the forced language
   @override
-  bool get isNullable {
-    if (cachedIsNullable != null) return cachedIsNullable!;
-    cachedIsNullable = false;
-    cachedIsNullable = force().isNullable;
-    return cachedIsNullable!;
+  bool get isNullable => _isNullable ??= _computeIsNullable();
+  bool _computeIsNullable() {
+    //suppose false, before traversing children
+    _isNullable = false;
+    var result = force().isNullable;
+    //clear the cache
+    _isNullable = null;
+    return result;
   }
 
   @override
-  bool get isProductive {
-    if (cachedIsProductive != null) return cachedIsProductive!;
-    cachedIsProductive = false;
-    cachedIsProductive = force().isProductive;
-    return cachedIsProductive!;
+  bool get isProductive => _isProductive ??= _computeIsProductive();
+  bool _computeIsProductive() {
+    //suppose false, before traversing children
+    _isProductive = false;
+    var result = force().isProductive;
+    //clear the cache
+    _isProductive = null;
+    return result;
   }
 
   @override
