@@ -312,11 +312,11 @@ class Delayed extends Language {
   Delayed(this.operand, this.token);
   final Language operand;
   final Object token;
-  Language? derivativex;
+  Language? derivative;
 
   @override
   Language derive(Object token) {
-    if (derivativex != null) return derivativex!;
+    if (derivative != null) return derivative!;
     return Delayed(this, token);
   }
 
@@ -330,14 +330,14 @@ class Delayed extends Language {
   String toString() => 'delayed($operand, $token)';
 
   Language force() {
-    if (derivativex != null) return derivativex!;
+    if (derivative != null) return derivative!;
     if (operand is Delayed) {
       var operandDerivative = (operand as Delayed).force();
-      derivativex = operandDerivative.derive(token);
+      derivative = operandDerivative.derive(token);
     } else {
-      derivativex = operand.derive(token);
+      derivative = operand.derive(token);
     }
-    return derivativex!;
+    return derivative!;
   }
 
   @override
