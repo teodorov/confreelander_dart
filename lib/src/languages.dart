@@ -315,10 +315,7 @@ class Delayed extends Language {
   Language? derivative;
 
   @override
-  Language derive(Object token) {
-    if (derivative != null) return derivative!;
-    return Delayed(this, token);
-  }
+  Language derive(Object token) => derivative ?? Delayed(this, token);
 
   @override
   Set parseTrees() => force().parseTrees();
@@ -333,11 +330,9 @@ class Delayed extends Language {
     if (derivative != null) return derivative!;
     if (operand is Delayed) {
       var operandDerivative = (operand as Delayed).force();
-      derivative = operandDerivative.derive(token);
-    } else {
-      derivative = operand.derive(token);
+      return derivative = operandDerivative.derive(token);
     }
-    return derivative!;
+    return derivative = operand.derive(token);
   }
 
   @override
