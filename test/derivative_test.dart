@@ -52,8 +52,8 @@ void main() {
       expect(identical(token('42').delta.derive(23), empty), true);
     });
 
-    test('D delayed', () {
-      expect(Delayed(token(42), 42).derive(42), empty);
+    test('D delayed xxx', () {
+      expect((token(42).delayed(42).derive(42) as Delayed).force(), empty);
     });
     test('D delayed a force', () {
       expect(Delayed(token('a'), 'a').force(), isA<Epsilon>());
@@ -62,13 +62,13 @@ void main() {
 
     test('D delayed a∘b toString', () {
       var lang = token('a').concatenation(token('b'));
-      expect(Delayed(lang, 'a').derive('b').toString(),
+      expect((Delayed(lang, 'a').derive('b') as Delayed).force().toString(),
           lang.derive('a').derive('b').toString());
     });
 
     test('D delayed a∘b equals', () {
       var lang = token('a').concatenation(token('b'));
-      expect(lang.delayed('a').derive('b'), lang.derive('a').derive('b'));
+      expect((lang.delayed('a').derive('b') as Delayed).force(), lang.derive('a').derive('b'));
     });
 
     test('ref', () {
@@ -92,6 +92,7 @@ void main() {
       var S = token('a') | rS;
       rS.target = S;
 
+      S.derive('a');
       expect(S.derive('a'), epsToken('a') | (token('a') | rS).delayed('a'));
       // expect(S.derive('a').derive('a'),
       //     epsToken('a') | (token('a') | rS).delayed('a'));
@@ -103,7 +104,7 @@ void main() {
       rS.target = S;
 
       expect(S.derive('a').derive('a'),
-          epsToken('a') | (token('a') | rS).delayed('a'));
+          (token('a') | rS).delayed('a').delayed('a'));
     });
   });
 }

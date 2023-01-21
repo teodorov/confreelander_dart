@@ -92,7 +92,7 @@ void main() {
     });
 
     test('ϵ >> f .isNullable', () {
-      var l = eps() >> (v) => print(v);
+      var l = eps() >> (v) => v;
       expect(l.isNullable, true);
     });
 

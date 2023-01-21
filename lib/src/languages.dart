@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:confreelander/confreelander.dart';
 import 'smart_constructors.dart';
 
 abstract class Language {
@@ -273,16 +274,17 @@ class Reference extends Composite {
 
   @override
   Language derive(Object token) {
-    if (cachedToken == null || cachedToken == token) {
-      if (cachedDerivative == null) {
-        return cachedDerivative ?? Delayed(target, token);
-      }
+    return Delayed(target, token);
+    // if (cachedToken == null || cachedToken == token) {
+    //   if (cachedDerivative == null) {
+    //     return cachedDerivative ?? Delayed(target, token);
+    //   }
 
-      return (cachedDerivative as Delayed).derivative ?? cachedDerivative!;
-    }
-    cachedToken = token;
-    cachedDerivative = Delayed(target, token);
-    return cachedDerivative!;
+    //   return (cachedDerivative as Delayed).derivative ?? cachedDerivative!;
+    // }
+    // cachedToken = token;
+    // cachedDerivative = Delayed(target, token);
+    // return cachedDerivative!;
   }
 
   @override
@@ -320,10 +322,13 @@ class Delayed extends Language {
   Delayed(this.operand, this.token);
   final Language operand;
   final Object token;
-  Language? derivative;
+  Language? derivativex;
 
   @override
-  Language derive(Object token) => force().derive(token);
+  Language derive(Object token) {
+    if (derivativex != null) return derivativex!;
+    return Delayed(this, token);
+  }
 
   @override
   Set parseTrees() => force().parseTrees();
@@ -334,7 +339,16 @@ class Delayed extends Language {
   @override
   String toString() => 'delayed($operand, $token)';
 
-  Language force() => derivative ??= operand.derive(token);
+  Language force() {
+    if (derivativex != null) return derivativex!;
+    if (operand is Delayed) {
+      var operandDerivative = (operand as Delayed).force();
+      derivativex = operandDerivative.derive(token);
+    } else {
+      derivativex = operand.derive(token);
+    }
+    return derivativex!;
+  }
 
   @override
   int get hashCode => Object.hash(runtimeType, operand, token);
