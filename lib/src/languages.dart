@@ -275,16 +275,6 @@ class Reference extends Composite {
   @override
   Language derive(Object token) {
     return Delayed(target, token);
-    // if (cachedToken == null || cachedToken == token) {
-    //   if (cachedDerivative == null) {
-    //     return cachedDerivative ?? Delayed(target, token);
-    //   }
-
-    //   return (cachedDerivative as Delayed).derivative ?? cachedDerivative!;
-    // }
-    // cachedToken = token;
-    // cachedDerivative = Delayed(target, token);
-    // return cachedDerivative!;
   }
 
   @override
