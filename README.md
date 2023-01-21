@@ -41,3 +41,24 @@ const like = 'sample';
 TODO: Tell users more about the package: where to find more information, how to 
 contribute to the package, how to file issues, what response they can expect 
 from the package authors, and more.
+
+## Equivalences
+
+```lean
+∅ | p ⟹ p
+p | ∅ ⟹ p
+ϵₛ | ϵₜ ⟹ ϵ_{s ∪ t}
+
+∅ ∘ p ⟹ ∅
+p ∘ ∅ ⟹ ∅
+ϵₛ ∘ p ⟹ p >> λu.(s, u)
+p ∘ ϵₛ ⟹ p >> λu.(u, s)
+
+∅* ⟹ ϵ_{∅}
+p** ⟹ p*
+
+∅ >> f ⟹ ∅
+ϵₛ >> f ⟹ ϵ_{s.map(λu.f(u))}
+(ϵₛ ∘ p) >> f ⟹ p >> λu. f( (s, u) )
+(p >> f) >> g ⟹ p >> (g ◯ f)
+```
