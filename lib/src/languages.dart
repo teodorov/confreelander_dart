@@ -20,6 +20,7 @@ abstract class Language {
   Language derive(Object token);
   Set parseTrees();
   bool get isNullable;
+  bool get isProductive => false;
 }
 
 /// a Terminal parser does not contain sub-parsers
@@ -68,6 +69,8 @@ class Epsilon extends Terminal {
 
   @override
   bool get isNullable => true;
+  @override
+  bool get isProductive => true;
 
   @override
   String toString() => 'ε';
@@ -97,6 +100,8 @@ class Token extends Terminal {
 
   @override
   bool get isNullable => false;
+  @override
+  bool get isProductive => true;
 
   @override
   String toString() => 'Token($token)';
@@ -125,7 +130,8 @@ class Union extends Composite {
 
   @override
   bool get isNullable => lhs.isNullable || rhs.isNullable;
-
+  @override
+  bool get isProductive => lhs.isProductive || rhs.isProductive;
   @override
   String toString() => '$lhs | $rhs';
 
@@ -163,7 +169,8 @@ class Concatenation extends Composite {
 
   @override
   bool get isNullable => lhs.isNullable && rhs.isNullable;
-
+  @override
+  bool get isProductive => lhs.isProductive && rhs.isProductive;
   @override
   String toString() => '$lhs ∘ $rhs';
 
@@ -190,6 +197,8 @@ class Star extends Composite {
 
   @override
   bool get isNullable => true;
+  @override
+  bool get isProductive => true;
 
   @override
   String toString() => '$operand*';
@@ -214,6 +223,8 @@ class Delta extends Composite {
 
   @override
   bool get isNullable => operand.isNullable;
+  @override
+  bool get isProductive => operand.isProductive;
 
   @override
   String toString() => 'δ($operand)';
@@ -241,6 +252,8 @@ class Projection extends Composite {
 
   @override
   bool get isNullable => operand.isNullable;
+  @override
+  bool get isProductive => operand.isProductive;
 
   @override
   String toString() => '$operand >> $projector';
@@ -270,6 +283,7 @@ class Reference extends Composite {
   Object? cachedToken;
   Set? cachedParseTrees;
   bool? cachedIsNullable;
+  bool? cachedIsProductive;
   int? cachedHashCode;
 
   ///needs memoization since D S = D S
@@ -290,6 +304,14 @@ class Reference extends Composite {
 
     cachedIsNullable = target.isNullable;
     return cachedIsNullable!;
+  }
+
+  @override
+  bool get isProductive {
+    if (cachedIsProductive != null) return cachedIsProductive!;
+    cachedIsProductive = false;
+    cachedIsProductive = target.isProductive;
+    return cachedIsProductive!;
   }
 
   @override
@@ -319,6 +341,7 @@ class Delayed extends Language {
   final Object token;
   Language? derivative;
   bool? cachedIsNullable;
+  bool? cachedIsProductive;
 
   ///need memoization
   @override
@@ -333,9 +356,16 @@ class Delayed extends Language {
   bool get isNullable {
     if (cachedIsNullable != null) return cachedIsNullable!;
     cachedIsNullable = false;
-
     cachedIsNullable = force().isNullable;
     return cachedIsNullable!;
+  }
+
+  @override
+  bool get isProductive {
+    if (cachedIsProductive != null) return cachedIsProductive!;
+    cachedIsProductive = false;
+    cachedIsProductive = force().isProductive;
+    return cachedIsProductive!;
   }
 
   @override
