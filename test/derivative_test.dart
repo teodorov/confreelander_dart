@@ -151,5 +151,19 @@ void main() {
       rsd = rsd.derive('a');
       expect((rsd as Delayed).force(), fixed);
     });
+
+    test('different derivatives diff tokens', () {
+      var rS = ref('S');
+      var s = token('a') | token('b');
+      rS.target = s;
+
+      expect(s.derive('a'), epsToken('a'));
+      expect(s.derive('b'), epsToken('b'));
+      expect(s.derive('c'), empty);
+
+      expect((rS.derive('a') as Delayed).force(), epsToken('a'));
+      expect((rS.derive('b') as Delayed).force(), epsToken('b'));
+      expect((rS.derive('c') as Delayed).force(), empty);
+    });
   });
 }

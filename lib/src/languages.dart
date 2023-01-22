@@ -76,7 +76,7 @@ class Epsilon extends Terminal {
   bool get isProductive => true;
 
   @override
-  String toString() => 'ε';
+  String toString() => 'ε$trees';
 
   @override
   int get hashCode =>
@@ -283,15 +283,23 @@ class Reference extends Composite {
   }
 
   Language? _derivative;
-  Object? cachedToken;
+  Object? _token;
   Set? cachedParseTrees;
   bool? _isNullable;
   bool? _isProductive;
   int? _hashCode;
 
   ///needs memoization since D S = D S
+  ///memoize just one derivative and one token
   @override
-  Language derive(Object token) => _derivative ??= Delayed(target, token);
+  Language derive(Object token) {
+    if (_token != null && _token == token && _derivative != null) {
+      return _derivative!;
+    }
+    _token = token;
+    _derivative = Delayed(target, token);
+    return _derivative!;
+  }
 
   @override
   Set parseTrees() => cachedParseTrees ??= target.parseTrees();

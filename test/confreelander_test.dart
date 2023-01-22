@@ -12,7 +12,7 @@ void main() {
     });
 
     test('print Epsilon', () {
-      expect(Epsilon().toString(), equals('ε'));
+      expect(Epsilon().toString(), equals('ε{∅}'));
     });
 
     test('print Token', () {
@@ -30,7 +30,7 @@ void main() {
     });
 
     test('print Star', () {
-      expect(Star(Epsilon()).toString(), equals('ε*'));
+      expect(Star(Epsilon()).toString(), equals('ε{∅}*'));
     });
 
     test('print Delta', () {
@@ -47,7 +47,8 @@ void main() {
     });
 
     test('print Delayed', () {
-      expect(Delayed(Epsilon(), Empty()).toString(), equals('delayed(ε, ∅)'));
+      expect(
+          Delayed(Epsilon(), Empty()).toString(), equals('delayed(ε{∅}, ∅)'));
     });
   });
   group('smart constructors', () {
