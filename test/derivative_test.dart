@@ -62,7 +62,7 @@ void main() {
 
     test('D delayed a∘b toString', () {
       var lang = token('a').concatenation(token('b'));
-      expect((Delayed(lang, 'a').derivative('b') as Delayed).force().toString(),
+      expect((lang.delayed('a').derivative('b') as Delayed).force().toString(),
           lang.derivative('a').derivative('b').toString());
     });
 
@@ -119,11 +119,11 @@ void main() {
       expect(rsd, fixed);
       expect((rsd as Delayed).force(), fixed);
       rsd = rsd.derivative('a');
-      expect(rsd, fixed);
-      expect((rsd as Delayed).force(), fixed);
+      expect(rsd, fixed.delayed('a'));
+      expect((rsd as Delayed).force(), fixed.delayed('a'));
       rsd = rsd.derivative('a');
-      expect(rsd, fixed);
-      expect((rsd as Delayed).force(), fixed);
+      expect(rsd, fixed.delayed('a').delayed('a'));
+      expect((rsd as Delayed).force(), fixed.delayed('a').delayed('a'));
     });
 
     test('delay accumulates', () {
@@ -138,10 +138,10 @@ void main() {
       expect(rsd, fixed.delayed('a').delayed('a'));
     });
 
-    test('force cleans accumulated delay', () {
+    test('force accumulated delay', () {
       var rS = ref('S');
       rS.target = rS;
-      var fixed = rS.delayed('a');
+      var fixed = rS.delayed('a').delayed('a').delayed('a');
       var rsd = rS.derivative('a');
       rsd = rsd.derivative('a');
       rsd = rsd.derivative('a');
@@ -160,6 +160,59 @@ void main() {
       expect((rS.derivative('a') as Delayed).force(), epsToken('a'));
       expect((rS.derivative('b') as Delayed).force(), epsToken('b'));
       expect((rS.derivative('c') as Delayed).force(), empty);
+    });
+
+    test('different derivatives diff tokens', () {
+      var s = token('c').seq(token('a') | token('b'));
+      var t1 = epsTrees({
+        [
+          {'c'},
+          'a'
+        ]
+      });
+      var t2 = epsTrees({
+        [
+          {'c'},
+          'b'
+        ]
+      });
+      //no delay
+      expect(s.derivative('c').derivative('a'), t1);
+      expect(s.derivative('c').derivative('b'), t2);
+      expect(s.derivative('c').derivative('c'), empty);
+      //different delay
+      expect((s.delayed('c').derivative('a') as Delayed).force(), t1);
+      expect((s.delayed('c').derivative('b') as Delayed).force(), t2);
+      expect((s.delayed('c').derivative('c') as Delayed).force(), empty);
+
+      //reuse delay
+      // ignore: non_constant_identifier_names
+      var delayed_c = s.delayed('c');
+      expect((delayed_c.derivative('a') as Delayed).force(), t1);
+      expect((delayed_c.derivative('b') as Delayed).force(), t2);
+      //expect((delayed_c.derivative('c') as Delayed).force(), empty);
+    });
+
+    test('different derivatives diff tokens 3', () {
+      var s = token('c').seq(token('a') | token('b'));
+      var t1 = epsTrees({
+        [
+          {'c'},
+          'a'
+        ]
+      });
+      var t2 = epsTrees({
+        [
+          {'c'},
+          'b'
+        ]
+      });
+      //reuse delay
+      // ignore: non_constant_identifier_names
+      var delayed_c = s.delayed('c');
+      expect((delayed_c.derivative('a') as Delayed).force(), t1);
+      expect((delayed_c.derivative('b') as Delayed).force(), t2);
+      expect((delayed_c.derivative('c') as Delayed).force(), empty);
     });
   });
 }

@@ -189,6 +189,16 @@ void main() {
       expect(rS.derivative('a').isNullable, false);
     });
 
+    test('force accumulated delay', () {
+      var rS = ref('S');
+      rS.target = rS;
+
+      var rsd = rS.derivative('a');
+      rsd = rsd.derivative('a');
+      rsd = rsd.derivative('a');
+      expect(rsd.isNullable, false);
+    });
+
     test('', () {});
   });
 }

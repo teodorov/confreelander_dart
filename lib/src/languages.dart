@@ -125,7 +125,8 @@ class Union extends Composite {
   Union(this.lhs, this.rhs);
   final Language lhs, rhs;
   @override
-  Language derivative(Object token) => lhs.derivative(token) | rhs.derivative(token);
+  Language derivative(Object token) =>
+      lhs.derivative(token) | rhs.derivative(token);
 
   //union the results from their children
   @override
@@ -358,13 +359,21 @@ class Delayed extends Language {
   Delayed(this.operand, this.token);
   final Language operand;
   final Object token;
+  Language? _forcedLanguage;
   Language? _derivative;
+  Object? _token;
   bool? _isNullable;
   bool? _isProductive;
 
   ///need memoization
   @override
-  Language derivative(Object token) => _derivative ?? Delayed(this, token);
+  Language derivative(Object token) {
+    if (_token != null && _token == token && _derivative != null) {
+       return _derivative!;
+    }
+    _token = token;
+    return _derivative = _forcedLanguage != null ? Delayed(_forcedLanguage!, token) : Delayed(this, token);
+  }
 
   @override
   Set parseTrees() => force().parseTrees();
@@ -397,12 +406,12 @@ class Delayed extends Language {
   String toString() => 'delayed($operand, $token)';
 
   Language force() {
-    if (_derivative != null) return _derivative!;
+    if (_forcedLanguage != null) return _forcedLanguage!;
     if (operand is Delayed) {
-      var operandDerivative = (operand as Delayed).force();
-      return _derivative = operandDerivative.derivative(token);
+      var forcedOperand = (operand as Delayed).force();
+      return _forcedLanguage = forcedOperand.derivative(token);
     }
-    return _derivative = operand.derivative(token);
+    return _forcedLanguage = operand.derivative(token);
   }
 
   @override
