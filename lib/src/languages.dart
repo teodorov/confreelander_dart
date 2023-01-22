@@ -7,7 +7,7 @@ abstract class Language {
 
   bool includes(Iterator it) {
     if (!it.moveNext()) return isNullable;
-    return derive(it.current).includes(it);
+    return derivative(it.current).includes(it);
   }
 
   ///A isNullable language accepts the empty word.
@@ -15,12 +15,12 @@ abstract class Language {
   ///So if not nullable then no parseTree.
   Set parse(Iterator it) {
     if (!it.moveNext()) return isNullable ? parseTrees() : {};
-    return derive(it.current).parse(it);
+    return derivative(it.current).parse(it);
   }
 
   get isEmpty => this == empty;
 
-  Language derive(Object token);
+  Language derivative(Object token);
   Set parseTrees();
   bool get isNullable;
   bool get isProductive => false;
@@ -37,7 +37,7 @@ class Empty extends Terminal {
   factory Empty() => emptyI;
 
   @override
-  Language derive(Object token) => empty;
+  Language derivative(Object token) => empty;
 
   //incomplete parse, the set of parse trees is empty
   @override
@@ -64,7 +64,7 @@ class Epsilon extends Terminal {
   }
 
   @override
-  Language derive(Object token) => empty;
+  Language derivative(Object token) => empty;
 
   //a complete parse, return the set of parse trees
   @override
@@ -94,7 +94,7 @@ class Token extends Terminal {
   Token(this.token);
   final Object token;
   @override
-  Language derive(Object token) =>
+  Language derivative(Object token) =>
       this.token == token ? epsToken(this.token) : empty;
 
   //incomplete parse, the set of parse trees is empty
@@ -125,7 +125,7 @@ class Union extends Composite {
   Union(this.lhs, this.rhs);
   final Language lhs, rhs;
   @override
-  Language derive(Object token) => lhs.derive(token) | rhs.derive(token);
+  Language derivative(Object token) => lhs.derivative(token) | rhs.derivative(token);
 
   //union the results from their children
   @override
@@ -152,8 +152,8 @@ class Concatenation extends Composite {
   Concatenation(this.lhs, this.rhs);
   final Language lhs, rhs;
   @override
-  Language derive(Object token) =>
-      lhs.delta.seq(rhs.derive(token)) | lhs.derive(token).seq(rhs);
+  Language derivative(Object token) =>
+      lhs.delta.seq(rhs.derivative(token)) | lhs.derivative(token).seq(rhs);
 
   //Concatenation nodes construct pairs of elements from their children
   @override
@@ -193,7 +193,7 @@ class Star extends Composite {
   Star(this.operand);
   final Language operand;
   @override
-  Language derive(Object token) => operand.derive(token).seq(operand);
+  Language derivative(Object token) => operand.derivative(token).seq(operand);
 
   @override
   Set parseTrees() => {null};
@@ -219,7 +219,7 @@ class Delta extends Composite {
   Delta(this.operand);
   final Language operand;
   @override
-  Language derive(Object token) => empty;
+  Language derivative(Object token) => empty;
 
   @override
   Set parseTrees() => operand.parseTrees();
@@ -246,7 +246,7 @@ class Projection extends Composite {
   final Language operand;
   final Function projector;
   @override
-  Language derive(Object token) => operand.derive(token) >> projector;
+  Language derivative(Object token) => operand.derivative(token) >> projector;
 
   //Projections apply their function to the result of their child
   @override
@@ -292,7 +292,7 @@ class Reference extends Composite {
   ///needs memoization since D S = D S
   ///memoize just one derivative and one token
   @override
-  Language derive(Object token) {
+  Language derivative(Object token) {
     if (_token != null && _token == token && _derivative != null) {
       return _derivative!;
     }
@@ -358,13 +358,13 @@ class Delayed extends Language {
   Delayed(this.operand, this.token);
   final Language operand;
   final Object token;
-  Language? derivative;
+  Language? _derivative;
   bool? _isNullable;
   bool? _isProductive;
 
   ///need memoization
   @override
-  Language derive(Object token) => derivative ?? Delayed(this, token);
+  Language derivative(Object token) => _derivative ?? Delayed(this, token);
 
   @override
   Set parseTrees() => force().parseTrees();
@@ -397,12 +397,12 @@ class Delayed extends Language {
   String toString() => 'delayed($operand, $token)';
 
   Language force() {
-    if (derivative != null) return derivative!;
+    if (_derivative != null) return _derivative!;
     if (operand is Delayed) {
       var operandDerivative = (operand as Delayed).force();
-      return derivative = operandDerivative.derive(token);
+      return _derivative = operandDerivative.derivative(token);
     }
-    return derivative = operand.derive(token);
+    return _derivative = operand.derivative(token);
   }
 
   @override

@@ -192,7 +192,7 @@ void main() {
     test('derive self loop not nullable', () {
       var rS = ref('S');
       rS.target = rS;
-      expect(rS.derive('a').isProductive, false);
+      expect(rS.derivative('a').isProductive, false);
     });
 
     test('two refs isProductive', () {

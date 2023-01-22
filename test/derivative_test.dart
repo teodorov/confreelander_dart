@@ -4,31 +4,31 @@ import 'package:test/test.dart';
 void main() {
   group('derivative', () {
     test('D empty', () {
-      expect(identical(empty, empty.derive(23)), true);
+      expect(identical(empty, empty.derivative(23)), true);
     });
 
     test('D epsilon', () {
-      expect(identical(eps().derive(23), empty), true);
+      expect(identical(eps().derivative(23), empty), true);
     });
 
     test('D token', () {
-      expect(identical(token(23).derive(42), empty), true);
-      expect(token(23).derive(23), isA<Epsilon>());
-      expect(token(23).derive(23).parseTrees(), equals({23}));
+      expect(identical(token(23).derivative(42), empty), true);
+      expect(token(23).derivative(23), isA<Epsilon>());
+      expect(token(23).derivative(23).parseTrees(), equals({23}));
     });
 
     test('D union', () {
       var lang = token('a') | token('b');
-      expect(lang.derive('a'), epsToken('a'));
-      expect(lang.derive('b'), epsToken('b'));
-      expect(lang.derive('c'), empty);
+      expect(lang.derivative('a'), epsToken('a'));
+      expect(lang.derivative('b'), epsToken('b'));
+      expect(lang.derivative('c'), empty);
     });
 
     test('D union smart eq', () {
       var lang = token('a') | token('b');
-      expect(epsToken('a') | empty, lang.derive('a'));
-      expect(empty | epsToken('b'), lang.derive('b'));
-      expect(empty | empty, lang.derive('c'));
+      expect(epsToken('a') | empty, lang.derivative('a'));
+      expect(empty | epsToken('b'), lang.derivative('b'));
+      expect(empty | empty, lang.derivative('c'));
     });
 
     test('D concat', () {
@@ -36,24 +36,24 @@ void main() {
       //use compare the toString representations because projections
       //do not work with structural equality
       expect(
-          (lang.derive('a')).toString(),
-          (token('a').delta.seq(token('b').derive('a')) |
+          (lang.derivative('a')).toString(),
+          (token('a').delta.seq(token('b').derivative('a')) |
                   epsToken('a').seq(token('b')))
               .toString());
       lang = token('a').star.seq(token('b'));
       expect(
-          lang.derive('b').toString(),
-          (token('a').star.delta.seq(token('b').derive('b')) |
+          lang.derivative('b').toString(),
+          (token('a').star.delta.seq(token('b').derivative('b')) |
                   empty.seq(token('a')).seq(token('b')))
               .toString());
     });
 
     test('D delta', () {
-      expect(identical(token('42').delta.derive(23), empty), true);
+      expect(identical(token('42').delta.derivative(23), empty), true);
     });
 
     test('D delayed xxx', () {
-      expect((token(42).delayed(42).derive(42) as Delayed).force(), empty);
+      expect((token(42).delayed(42).derivative(42) as Delayed).force(), empty);
     });
     test('D delayed a force', () {
       expect(Delayed(token('a'), 'a').force(), isA<Epsilon>());
@@ -62,14 +62,14 @@ void main() {
 
     test('D delayed a∘b toString', () {
       var lang = token('a').concatenation(token('b'));
-      expect((Delayed(lang, 'a').derive('b') as Delayed).force().toString(),
-          lang.derive('a').derive('b').toString());
+      expect((Delayed(lang, 'a').derivative('b') as Delayed).force().toString(),
+          lang.derivative('a').derivative('b').toString());
     });
 
     test('D delayed a∘b equals', () {
       var lang = token('a').concatenation(token('b'));
-      expect((lang.delayed('a').derive('b') as Delayed).force(),
-          lang.derive('a').derive('b'));
+      expect((lang.delayed('a').derivative('b') as Delayed).force(),
+          lang.derivative('a').derivative('b'));
     });
 
     test('ref', () {
@@ -84,8 +84,6 @@ void main() {
 
       expect(rS.hashCode == rS1.hashCode, true);
       expect(S.hashCode == S1.hashCode, true);
-
-      //expect(S.derive('a'), epsToken('a') | S);
     });
 
     test('S = a | S =a=> ϵ | S', () {
@@ -93,10 +91,8 @@ void main() {
       var S = token('a') | rS;
       rS.target = S;
 
-      S.derive('a');
-      expect(S.derive('a'), epsToken('a') | (token('a') | rS).delayed('a'));
-      // expect(S.derive('a').derive('a'),
-      //     epsToken('a') | (token('a') | rS).delayed('a'));
+      S.derivative('a');
+      expect(S.derivative('a'), epsToken('a') | (token('a') | rS).delayed('a'));
     });
 
     test('S = a | S =a=> =a=>', () {
@@ -104,14 +100,14 @@ void main() {
       var S = token('a') | rS;
       rS.target = S;
 
-      expect(S.derive('a').derive('a'),
+      expect(S.derivative('a').derivative('a'),
           (token('a') | rS).delayed('a').delayed('a'));
     });
 
     test('self loop', () {
       var rS = ref('S');
       rS.target = rS;
-      expect(rS.derive('a'), rS.delayed('a'));
+      expect(rS.derivative('a'), rS.delayed('a'));
     });
 
     test('derivative of (delayed self loop) is itself', () {
@@ -119,13 +115,13 @@ void main() {
 
       rS.target = rS;
       var fixed = rS.delayed('a');
-      var rsd = rS.derive('a');
+      var rsd = rS.derivative('a');
       expect(rsd, fixed);
       expect((rsd as Delayed).force(), fixed);
-      rsd = rsd.derive('a');
+      rsd = rsd.derivative('a');
       expect(rsd, fixed);
       expect((rsd as Delayed).force(), fixed);
-      rsd = rsd.derive('a');
+      rsd = rsd.derivative('a');
       expect(rsd, fixed);
       expect((rsd as Delayed).force(), fixed);
     });
@@ -134,11 +130,11 @@ void main() {
       var rS = ref('S');
       rS.target = rS;
       var fixed = rS.delayed('a');
-      var rsd = rS.derive('a');
+      var rsd = rS.derivative('a');
       expect(rsd, fixed);
-      rsd = rsd.derive('a');
-      expect(rsd, fixed.derive('a'));
-      rsd = rsd.derive('a');
+      rsd = rsd.derivative('a');
+      expect(rsd, fixed.derivative('a'));
+      rsd = rsd.derivative('a');
       expect(rsd, fixed.delayed('a').delayed('a'));
     });
 
@@ -146,9 +142,9 @@ void main() {
       var rS = ref('S');
       rS.target = rS;
       var fixed = rS.delayed('a');
-      var rsd = rS.derive('a');
-      rsd = rsd.derive('a');
-      rsd = rsd.derive('a');
+      var rsd = rS.derivative('a');
+      rsd = rsd.derivative('a');
+      rsd = rsd.derivative('a');
       expect((rsd as Delayed).force(), fixed);
     });
 
@@ -157,13 +153,13 @@ void main() {
       var s = token('a') | token('b');
       rS.target = s;
 
-      expect(s.derive('a'), epsToken('a'));
-      expect(s.derive('b'), epsToken('b'));
-      expect(s.derive('c'), empty);
+      expect(s.derivative('a'), epsToken('a'));
+      expect(s.derivative('b'), epsToken('b'));
+      expect(s.derivative('c'), empty);
 
-      expect((rS.derive('a') as Delayed).force(), epsToken('a'));
-      expect((rS.derive('b') as Delayed).force(), epsToken('b'));
-      expect((rS.derive('c') as Delayed).force(), empty);
+      expect((rS.derivative('a') as Delayed).force(), epsToken('a'));
+      expect((rS.derivative('b') as Delayed).force(), epsToken('b'));
+      expect((rS.derivative('c') as Delayed).force(), empty);
     });
   });
 }

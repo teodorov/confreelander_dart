@@ -186,7 +186,7 @@ void main() {
     test('derive self loop not nullable', () {
       var rS = ref('S');
       rS.target = rS;
-      expect(rS.derive('a').isNullable, false);
+      expect(rS.derivative('a').isNullable, false);
     });
 
     test('', () {});
