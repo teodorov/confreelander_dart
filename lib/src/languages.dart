@@ -369,10 +369,12 @@ class Delayed extends Language {
   @override
   Language derivative(Object token) {
     if (_token != null && _token == token && _derivative != null) {
-       return _derivative!;
+      return _derivative!;
     }
     _token = token;
-    return _derivative = _forcedLanguage != null ? Delayed(_forcedLanguage!, token) : Delayed(this, token);
+    return _derivative = _forcedLanguage != null
+        ? Delayed(_forcedLanguage!, token)
+        : Delayed(this, token);
   }
 
   @override
