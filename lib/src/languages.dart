@@ -285,7 +285,7 @@ class Reference extends Composite {
 
   Language? _derivative;
   Object? _token;
-  Set? cachedParseTrees;
+  Set? _parseTrees;
   bool? _isNullable;
   bool? _isProductive;
   int? _hashCode;
@@ -303,7 +303,7 @@ class Reference extends Composite {
   }
 
   @override
-  Set parseTrees() => cachedParseTrees ??= target.parseTrees();
+  Set parseTrees() => _parseTrees ??= target.parseTrees();
 
   ///needs fixed point & memoization
   ///the idea is suppose false, and see if we can get through by traversing the target
