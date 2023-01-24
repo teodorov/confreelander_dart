@@ -138,12 +138,13 @@ void main() {
       expect(rS.isNullable, true);
     });
 
-    test('S = S* -- e = eps .isNullable', () {
-      var rS = ref('S');
-      var l = rS; //TODO: use ref instead of star
-      rS.target = l;
+    test('x = ϵ | x -- e = eps .isNullable', () {
+      var rx = ref('x');
+      var x = eps() | rx;
+      rx.target = x;
 
-      expect(l.isNullable, true);
+      expect(x.isNullable, true);
+      expect(rx.isNullable, true);
     });
 
     test('self loop not nullable', () {
