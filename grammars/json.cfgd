@@ -1,0 +1,43 @@
+grammar json;
+Json 
+	: 'null'
+	| 'true'
+	| 'false'
+	| String
+	| Number
+	| Object
+	| Array
+	;
+String
+	: '"' Character* '"'
+	;
+Number
+	: Integer '.'? (('E' | 'e') ('+'|'-')? Digit+) ?
+	;
+Object
+	: '{' String ':' Json '}'
+	;
+Array
+	: '[' (Json (',' Json)+)* ']'
+	;
+Character
+	: ([0020 .. 10FFFF] - '"' - '\\')
+	| '\\' Escaped
+	;
+Escaped
+	: ["\/bfnrt]
+	| 'u' Hex Hex Hex Hex
+	;
+Hex
+	: Digit
+	| 'A' .. 'F'
+	| 'a' .. 'f'
+	;
+Digit
+	: [0..9]
+	;
+Integer
+	: Digit+
+	| '-' Digit+
+	;
+
