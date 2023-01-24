@@ -33,6 +33,30 @@ void main() {
       expect(x.includes(it('aaaa')), true);
     });
 
+    test('regular direct recursive X = a | X', () {
+      var rx = ref('x');
+      var x = token('a') | rx;
+      rx.target = x;
+
+      expect(x.includes(it('')), false);
+      expect(x.includes(it('a')), true);
+      expect(x.includes(it('aa')), true);
+      expect(x.includes(it('aaa')), true);
+      expect(x.includes(it('aaaa')), true);
+    });
+
+    test('regular direct recursive X = X | a', () {
+      var rx = ref('x');
+      var x = token('a') | rx;
+      rx.target = x;
+
+      expect(x.includes(it('')), false);
+      expect(x.includes(it('a')), true);
+      expect(x.includes(it('aa')), true);
+      expect(x.includes(it('aaa')), true);
+      expect(x.includes(it('aaaa')), true);
+    });
+
     test('regular direct recursive X = ϵ | a | X', () {
       var rx = ref('x');
       var x = eps() | token('a') | rx;
