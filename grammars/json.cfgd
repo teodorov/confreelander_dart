@@ -1,43 +1,42 @@
 grammar json;
-Json 
+json 
 	: 'null'
 	| 'true'
 	| 'false'
-	| String
-	| Number
-	| Object
-	| Array
+	| string
+	| number
+	| object
+	| array
 	;
-String
-	: '"' Character* '"'
+string
+	: '"' character* '"'
 	;
-Number
-	: Integer '.'? (('E' | 'e') ('+'|'-')? Digit+) ?
+number
+	: integer '.'? (('E' | 'e') ('+'|'-')? ('0' .. '9')+)?
 	;
-Object
-	: '{' String ':' Json '}'
+object
+	: '{' string ':' json '}'
 	;
-Array
-	: '[' (Json (',' Json)+)* ']'
+array
+	: '[' (json (',' json)+)* ']'
 	;
-Character
-	: ([0020 .. 10FFFF] - '"' - '\\')
-	| '\\' Escaped
+character
+	: ~('\u0000' .. '\u001F' | '"' | '\\') // [0020 .. 10FFFF] & ~('"' | '\\')
+	| '\\' escaped
 	;
-Escaped
-	: ["\/bfnrt]
-	| 'u' Hex Hex Hex Hex
+escaped
+	: ["\\/bfnrt]
+	| 'u' hex hex hex hex
 	;
-Hex
-	: Digit
+hex
+	: '0' .. '9'
 	| 'A' .. 'F'
 	| 'a' .. 'f'
 	;
-Digit
-	: [0..9]
-	;
-Integer
-	: Digit+
-	| '-' Digit+
+integer
+	: '-'? ('0' | '1'..'9' '0' .. '9')
 	;
 
+WS
+   : [ \t\n\r] + -> skip
+   ;
