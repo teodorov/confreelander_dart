@@ -14,38 +14,28 @@ void main() {
     test('D token', () {
       expect(identical(token(23).derivative(42), empty), true);
       expect(token(23).derivative(23), isA<Epsilon>());
-      expect(token(23).derivative(23).parseTrees(), equals({23}));
     });
 
     test('D union', () {
       var lang = token('a') | token('b');
-      expect(lang.derivative('a'), epsToken('a'));
-      expect(lang.derivative('b'), epsToken('b'));
+      expect(lang.derivative('a'), eps());
+      expect(lang.derivative('b'), eps());
       expect(lang.derivative('c'), empty);
     });
 
     test('D union smart eq', () {
       var lang = token('a') | token('b');
-      expect(epsToken('a') | empty, lang.derivative('a'));
-      expect(empty | epsToken('b'), lang.derivative('b'));
+      expect(eps() | empty, lang.derivative('a'));
+      expect(empty | eps(), lang.derivative('b'));
       expect(empty | empty, lang.derivative('c'));
     });
 
     test('D concat', () {
       var lang = token('a').seq(token('b'));
-      //use compare the toString representations because projections
-      //do not work with structural equality
       expect(
-          (lang.derivative('a')).toString(),
+          (lang.derivative('a')),
           (token('a').delta.seq(token('b').derivative('a')) |
-                  epsToken('a').seq(token('b')))
-              .toString());
-      lang = token('a').star.seq(token('b'));
-      expect(
-          lang.derivative('b').toString(),
-          (token('a').star.delta.seq(token('b').derivative('b')) |
-                  empty.seq(token('a')).seq(token('b')))
-              .toString());
+              eps().seq(token('b'))));
     });
 
     test('D delta', () {
@@ -92,7 +82,7 @@ void main() {
       rS.target = S;
 
       S.derivative('a');
-      expect(S.derivative('a'), epsToken('a') | (token('a') | rS).delayed('a'));
+      expect(S.derivative('a'), eps() | (token('a') | rS).delayed('a'));
     });
 
     test('S = a | S =a=> =a=>', () {
@@ -153,29 +143,19 @@ void main() {
       var s = token('a') | token('b');
       rS.target = s;
 
-      expect(s.derivative('a'), epsToken('a'));
-      expect(s.derivative('b'), epsToken('b'));
+      expect(s.derivative('a'), eps());
+      expect(s.derivative('b'), eps());
       expect(s.derivative('c'), empty);
 
-      expect((rS.derivative('a') as Delayed).force(), epsToken('a'));
-      expect((rS.derivative('b') as Delayed).force(), epsToken('b'));
+      expect((rS.derivative('a') as Delayed).force(), eps());
+      expect((rS.derivative('b') as Delayed).force(), eps());
       expect((rS.derivative('c') as Delayed).force(), empty);
     });
 
     test('different derivatives diff tokens', () {
       var s = token('c').seq(token('a') | token('b'));
-      var t1 = epsTrees({
-        [
-          {'c'},
-          'a'
-        ]
-      });
-      var t2 = epsTrees({
-        [
-          {'c'},
-          'b'
-        ]
-      });
+      var t1 = eps().delta.seq(eps());
+      var t2 = t1;
       //no delay
       expect(s.derivative('c').derivative('a'), t1);
       expect(s.derivative('c').derivative('b'), t2);
@@ -195,18 +175,8 @@ void main() {
 
     test('different derivatives diff tokens 3', () {
       var s = token('c').seq(token('a') | token('b'));
-      var t1 = epsTrees({
-        [
-          {'c'},
-          'a'
-        ]
-      });
-      var t2 = epsTrees({
-        [
-          {'c'},
-          'b'
-        ]
-      });
+      var t1 = eps().delta.seq(eps());
+      var t2 = t1;
       //reuse delay
       // ignore: non_constant_identifier_names
       var delayed_c = s.delayed('c');

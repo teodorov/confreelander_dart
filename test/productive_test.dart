@@ -9,8 +9,6 @@ void main() {
 
     test('ϵ.isProductive', () {
       expect(eps().isProductive, true);
-      expect(epsToken(2).isProductive, true);
-      expect(epsTrees({2}).isProductive, true);
     });
     test('token.isProductive', () {
       expect(token(42).isProductive, true);
@@ -57,20 +55,6 @@ void main() {
       var l = (eps() | token(3)).seq(empty | empty);
       expect(l.isProductive, false);
     });
-    test('t(3).star.isProductive', () {
-      var l = token(3).star;
-      expect(l.isProductive, true);
-    });
-
-    test('∅* .isProductive', () {
-      var l = empty.star;
-      expect(l.isProductive, true);
-    });
-
-    test('(ϵ | t(3)) ∘ (∅ | ∅)* .isProductive', () {
-      var l = (eps() | token(3)).seq((empty | empty).star);
-      expect(l.isProductive, true);
-    });
 
     test('delta ∅ .isProductive', () {
       var l = empty.delta;
@@ -84,21 +68,6 @@ void main() {
 
     test('delta token(2) .isProductive', () {
       var l = token(2).delta;
-      expect(l.isProductive, true);
-    });
-
-    test('∅ >> f .isProductive', () {
-      var l = empty >> (v) => print(v);
-      expect(l.isProductive, false);
-    });
-
-    test('ϵ >> f .isProductive', () {
-      var l = eps() >> (v) => v;
-      expect(l.isProductive, true);
-    });
-
-    test('tok(3) >> f .isProductive', () {
-      var l = token(3) >> (v) => print(v);
       expect(l.isProductive, true);
     });
 
@@ -162,22 +131,6 @@ void main() {
     test('S = S | ϵ rS.isProductive', () {
       var rS = ref('S');
       var l = rS | eps();
-      rS.target = l;
-
-      expect(rS.isProductive, true);
-    });
-
-    test('S = S* .isProductive', () {
-      var rS = ref('S');
-      var l = rS.star;
-      rS.target = l;
-
-      expect(l.isProductive, true);
-    });
-
-    test('S = S* rS.isProductive', () {
-      var rS = ref('S');
-      var l = rS.star;
       rS.target = l;
 
       expect(rS.isProductive, true);

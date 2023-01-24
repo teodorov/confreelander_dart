@@ -8,8 +8,6 @@ void main() {
     });
     test('ϵ.isNullable', () {
       expect(eps().isNullable, true);
-      expect(epsToken(2).isNullable, true);
-      expect(epsTrees({2}).isNullable, true);
     });
     test('token.isNullable', () {
       expect(token(42).isNullable, false);
@@ -56,18 +54,12 @@ void main() {
       var l = (eps() | token(3)).seq(empty | empty);
       expect(l.isNullable, false);
     });
-    test('t(3).star.isNullable', () {
-      var l = token(3).star;
-      expect(l.isNullable, true);
-    });
-
-    test('∅* .isNullable', () {
-      var l = empty.star;
-      expect(l.isNullable, true);
-    });
 
     test('(ϵ | t(3)) ∘ (∅ | ∅)* .isNullable', () {
-      var l = (eps() | token(3)).seq((empty | empty).star);
+      var rI = ref('I');
+      var i = eps() | (empty | empty).seq(rI);
+      rI.target = i;
+      var l = (eps() | token(3)).seq(rI);
       expect(l.isNullable, true);
     });
 
@@ -83,21 +75,6 @@ void main() {
 
     test('delta token(2) .isNullable', () {
       var l = token(2).delta;
-      expect(l.isNullable, false);
-    });
-
-    test('∅ >> f .isNullable', () {
-      var l = empty >> (v) => print(v);
-      expect(l.isNullable, false);
-    });
-
-    test('ϵ >> f .isNullable', () {
-      var l = eps() >> (v) => v;
-      expect(l.isNullable, true);
-    });
-
-    test('tok(3) >> f .isNullable', () {
-      var l = token(3) >> (v) => print(v);
       expect(l.isNullable, false);
     });
 
@@ -161,20 +138,12 @@ void main() {
       expect(rS.isNullable, true);
     });
 
-    test('S = S* .isNullable', () {
+    test('S = S* -- e = eps .isNullable', () {
       var rS = ref('S');
-      var l = rS.star;
+      var l = rS; //TODO: use ref instead of star
       rS.target = l;
 
       expect(l.isNullable, true);
-    });
-
-    test('S = S* rS.isNullable', () {
-      var rS = ref('S');
-      var l = rS.star;
-      rS.target = l;
-
-      expect(rS.isNullable, true);
     });
 
     test('self loop not nullable', () {

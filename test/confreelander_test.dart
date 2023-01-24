@@ -12,7 +12,7 @@ void main() {
     });
 
     test('print Epsilon', () {
-      expect(Epsilon().toString(), equals('ε{∅}'));
+      expect(Epsilon().toString(), equals('ε'));
     });
 
     test('print Token', () {
@@ -29,17 +29,8 @@ void main() {
           equals('Token(toto) ∘ ∅'));
     });
 
-    test('print Star', () {
-      expect(Star(Epsilon()).toString(), equals('ε{∅}*'));
-    });
-
     test('print Delta', () {
       expect(Delta(Token('x')).toString(), equals('δ(Token(x))'));
-    });
-
-    test('print Projection', () {
-      expect(Projection(Token('x'), (x) => true).toString(),
-          equals('Token(x) >> Closure: (dynamic) => bool'));
     });
 
     test('print Reference', () {
@@ -47,8 +38,7 @@ void main() {
     });
 
     test('print Delayed', () {
-      expect(
-          Delayed(Epsilon(), Empty()).toString(), equals('delayed(ε{∅}, ∅)'));
+      expect(Delayed(Epsilon(), Empty()).toString(), equals('delayed(ε, ∅)'));
     });
   });
   group('smart constructors', () {
@@ -78,29 +68,7 @@ void main() {
       expect(eps(), isA<Epsilon>());
       var a = eps();
       var b = eps();
-      expect(identical(a, b), false);
-      expect(identical(a.parseTrees(), b.parseTrees()), false);
-
-      a = epsToken(2);
-      expect(a.parseTrees(), equals({2}));
-
-      a = epsToken('to');
-      expect(a.parseTrees(), equals({'to'}));
-
-      b = epsTrees({});
-      expect(identical(b, empty), false);
-      b = epsTrees({empty});
-      expect(identical(b, empty), false);
-      b = epsTrees({
-        {2},
-        {'t'}
-      });
-      expect(
-          b.parseTrees(),
-          equals({
-            {2},
-            {'t'}
-          }));
+      expect(identical(a, b), true);
     });
     test('reference', () {
       expect(identical(empty.ref('r'), empty), true);
