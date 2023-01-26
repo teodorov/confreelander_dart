@@ -289,7 +289,7 @@ class Reference extends Composite {
   @override
   String computeTGF(Map<Language, String> map) {
     if (map[this] != null) return '';
-    map[this] = '${identityHashCode(this)} R($name)[${identityHashCode(this)}]';
+    map[this] = '${identityHashCode(this)} R($name)';
     var targetL = target.computeTGF(map);
     return '$targetL\n${identityHashCode(this)} ${identityHashCode(target)}\n';
   }
@@ -375,8 +375,7 @@ class Delayed extends Language {
   @override
   String computeTGF(Map<Language, String> map) {
     if (map[this] != null) return '';
-    map[this] =
-        '${identityHashCode(this)} Δ($token)[${identityHashCode(this)}]';
+    map[this] = '${identityHashCode(this)} Δ($token)';
     var opL = operand.computeTGF(map);
     return '$opL\n${identityHashCode(this)} ${identityHashCode(operand)}\n';
   }
