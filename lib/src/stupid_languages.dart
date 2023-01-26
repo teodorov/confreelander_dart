@@ -317,33 +317,41 @@ class Delayed extends Language {
     return _derivative = force().delayed(token);
   }
 
+  bool _visited = false;
+
   ///needs fixed point & memoization
   ///the idea is suppose false, and see if we can get through by traversing the forced language
   @override
   bool get isNullable => _isNullable ??= _computeIsNullable();
   bool _computeIsNullable() {
     force();
-    if (this == _forcedLanguage) {
+    if (this == _forcedLanguage || _visited) {
       var result = operand.isNullable;
-      _isNullable = null;
+      _visited = false;
       return result;
     }
     //suppose false, before traversing children
-    _isNullable = false;
+    _visited = true;
     var result = _forcedLanguage!.isNullable;
     //clear the cache
-    _isNullable = null;
+    _visited = false;
     return result;
   }
 
   @override
   bool get isProductive => _isProductive ??= _computeIsProductive();
   bool _computeIsProductive() {
+    force();
+    if (_visited) {
+      var result = operand.isProductive;
+      _visited = false;
+      return result;
+    }
     //suppose false, before traversing children
-    _isProductive = false;
-    var result = force().isProductive;
+    _visited = true;
+    var result = _forcedLanguage!.isProductive;
     //clear the cache
-    _isProductive = null;
+    _visited = false;
     return result;
   }
 

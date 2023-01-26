@@ -88,6 +88,10 @@ void main() {
       rx = ref('x');
       x = token('a') | rx;
       rx.target = x;
+      expect(x.includes(it('ab')), false);
+      rx = ref('x');
+      x = token('a') | rx;
+      rx.target = x;
       expect(x.includes(it('aaa')), true);
       rx = ref('x');
       x = token('a') | rx;

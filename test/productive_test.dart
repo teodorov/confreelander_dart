@@ -118,6 +118,13 @@ void main() {
       rS.target = l;
 
       expect(rS.isProductive, true);
+      expect(l.isProductive, true);
+      expect(l.derivative('a').isProductive, true);
+      expect(l.derivative('a').derivative('a').isProductive, true);
+      expect(
+          l.derivative('a').derivative('a').derivative('a').isProductive, true);
+      expect(l.derivative('a').derivative('a').derivative('b').isProductive,
+          false);
     });
 
     test('S = ϵ | S rS.isProductive', () {

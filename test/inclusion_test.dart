@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import "package:characters/characters.dart";
 import 'package:confreelander/src/stupid_constructors.dart';
 import 'package:test/test.dart';
@@ -38,40 +40,47 @@ void main() {
       var x = token('a') | rx;
       rx.target = x;
 
-      // print('\n-----X----\n');
-      // File('Lx.tgf').writeAsStringSync(x.toTGF());
+      print('\n-----X----\n');
+      File('Lx.tgf').writeAsStringSync(x.toTGF());
 
-      // print('\n-----dX----\n');
-      // rx = ref('x');
-      // x = token('a') | rx;
-      // rx.target = x;
-      // File('Ldx.tgf').writeAsStringSync(x.derivative('a').toTGF());
+      print('\n-----dX----\n');
+      rx = ref('x');
+      x = token('a') | rx;
+      rx.target = x;
+      File('Ldx.tgf').writeAsStringSync(x.derivative('a').toTGF());
 
-      // print('\n-----ddX----\n');
-      // rx = ref('x');
-      // x = token('a') | rx;
-      // rx.target = x;
-      // File('Lddx.tgf')
-      //     .writeAsStringSync(x.derivative('a').derivative('a').toTGF());
+      print('\n-----ddX----\n');
+      rx = ref('x');
+      x = token('a') | rx;
+      rx.target = x;
+      File('Ldbx.tgf')
+          .writeAsStringSync(x.derivative('a').derivative('b').toTGF());
 
-      // print('\n-----dddX----\n');
-      // rx = ref('x');
-      // x = token('a') | rx;
-      // rx.target = x;
-      // File('Ldddx.tgf').writeAsStringSync(
-      //     x.derivative('a').derivative('a').derivative('a').toTGF());
+      print('\n-----ddX----\n');
+      rx = ref('x');
+      x = token('a') | rx;
+      rx.target = x;
+      File('Lddx.tgf')
+          .writeAsStringSync(x.derivative('a').derivative('a').toTGF());
 
-      // print('\n-----ddddX----\n');
-      // rx = ref('x');
-      // x = token('a') | rx;
-      // rx.target = x;
+      print('\n-----dddX----\n');
+      rx = ref('x');
+      x = token('a') | rx;
+      rx.target = x;
+      File('Ldddx.tgf').writeAsStringSync(
+          x.derivative('a').derivative('a').derivative('a').toTGF());
 
-      // File('Lddddx.tgf').writeAsStringSync(x
-      //     .derivative('a')
-      //     .derivative('a')
-      //     .derivative('a')
-      //     .derivative('a')
-      //     .toTGF());
+      print('\n-----ddddX----\n');
+      rx = ref('x');
+      x = token('a') | rx;
+      rx.target = x;
+
+      File('Lddddx.tgf').writeAsStringSync(x
+          .derivative('a')
+          .derivative('a')
+          .derivative('a')
+          .derivative('a')
+          .toTGF());
 
       rx = ref('x');
       x = token('a') | rx;
@@ -85,6 +94,10 @@ void main() {
       x = token('a') | rx;
       rx.target = x;
       expect(x.includes(it('aa')), true);
+      rx = ref('x');
+      x = token('a') | rx;
+      rx.target = x;
+      expect(x.includes(it('ab')), false);
       rx = ref('x');
       x = token('a') | rx;
       rx.target = x;
