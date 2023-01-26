@@ -1,4 +1,5 @@
 import 'package:confreelander/confreelander.dart';
+import 'package:confreelander/src/smart_constructors.dart';
 import 'package:test/test.dart';
 
 void main() {
