@@ -312,9 +312,11 @@ class Delayed extends Language {
       return _derivative!;
     }
     _token = token;
-    return _derivative = _forcedLanguage != null
-        ? Delayed(_forcedLanguage!, token)
-        : Delayed(this, token);
+    if (_forcedLanguage != null) {
+      return _derivative = _forcedLanguage!.delayed(token);
+    }
+    force();
+    return _derivative = _forcedLanguage!.delayed(token);
   }
 
   ///needs fixed point & memoization

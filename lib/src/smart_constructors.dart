@@ -37,9 +37,9 @@ extension SmartConstructors on Language {
   Language get delta => Delta(this);
 
   Language delayed(Object token) {
-    // if (this is Delayed) {
-    //   return Delayed((this as Delayed).force(), token);
-    // }
+    if (this is Delayed) {
+      return Delayed((this as Delayed).force(), token);
+    }
     return Delayed(this, token);
   }
 
