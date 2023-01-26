@@ -12,6 +12,10 @@ Reference ref(String name) => Reference(name);
 ///
 /// ∅ ∘ p ⟹ ∅
 /// p ∘ ∅ ⟹ ∅
+///
+/// delayed(ϵ,t) ⟹ ∅
+/// delayed(delayed(L, t₀), t₁) ⟹ delayed(L, t₀)
+///                 where delayed(L, t₀) == delayed(L, t₀).forced && t₀ == t₁
 
 extension SmartConstructors on Language {
   Language operator |(Language other) {
