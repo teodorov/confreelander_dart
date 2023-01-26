@@ -43,7 +43,7 @@ void main() {
     });
 
     test('D delayed xxx', () {
-      expect((token(42).delayed(42).derivative(42) as Delayed).force(), empty);
+      expect(token(42).delayed(42).derivative(42), empty);
     });
     test('D delayed a force', () {
       expect(Delayed(token('a'), 'a').force(), isA<Epsilon>());
@@ -91,7 +91,7 @@ void main() {
       rS.target = S;
 
       expect(S.derivative('a').derivative('a'),
-          (token('a') | rS).delayed('a').delayed('a'));
+          (eps() | (token('a') | rS).delayed('a')).delayed('a'));
     });
 
     test('self loop', () {
@@ -109,11 +109,11 @@ void main() {
       expect(rsd, fixed);
       expect((rsd as Delayed).force(), fixed);
       rsd = rsd.derivative('a');
-      expect(rsd, fixed.delayed('a'));
-      expect((rsd as Delayed).force(), fixed.delayed('a'));
+      expect(rsd, fixed);
+      expect((rsd as Delayed).force(), fixed);
       rsd = rsd.derivative('a');
-      expect(rsd, fixed.delayed('a').delayed('a'));
-      expect((rsd as Delayed).force(), fixed.delayed('a').delayed('a'));
+      expect(rsd, fixed);
+      expect((rsd as Delayed).force(), fixed);
     });
 
     test('delay accumulates', () {
@@ -131,11 +131,11 @@ void main() {
     test('force accumulated delay', () {
       var rS = ref('S');
       rS.target = rS;
-      var fixed = rS.delayed('a').delayed('a').delayed('a');
+      var fixed = rS.delayed('a');
       var rsd = rS.derivative('a');
       rsd = rsd.derivative('a');
       rsd = rsd.derivative('a');
-      expect((rsd as Delayed).force(), fixed);
+      expect(rsd, fixed);
     });
 
     test('different derivatives diff tokens', () {

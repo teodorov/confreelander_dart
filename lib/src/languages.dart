@@ -22,7 +22,7 @@ abstract class Language {
   toTGF() {
     Map<Language, String> nodeMap =
         HashMap(equals: identical, hashCode: identityHashCode);
-    String links = this.computeTGF(nodeMap);
+    String links = computeTGF(nodeMap);
     String nodes = nodeMap.values.join('\n');
     return '0 0\n$nodes\n#\n0 ${identityHashCode(this)}\n$links';
   }
@@ -289,7 +289,7 @@ class Reference extends Composite {
   @override
   String computeTGF(Map<Language, String> map) {
     if (map[this] != null) return '';
-    map[this] = '${identityHashCode(this)} R($name)';
+    map[this] = '${identityHashCode(this)} R($name)[${identityHashCode(this)}]';
     var targetL = target.computeTGF(map);
     return '$targetL\n${identityHashCode(this)} ${identityHashCode(target)}\n';
   }
@@ -312,11 +312,11 @@ class Delayed extends Language {
       return _derivative!;
     }
     _token = token;
-    if (_forcedLanguage != null) {
-      return _derivative = _forcedLanguage!.delayed(token);
+
+    if (_forcedLanguage == this && token == this.token) {
+      return _derivative = this;
     }
-    force();
-    return _derivative = _forcedLanguage!.delayed(token);
+    return _derivative = force().delayed(token);
   }
 
   ///needs fixed point & memoization
@@ -324,9 +324,15 @@ class Delayed extends Language {
   @override
   bool get isNullable => _isNullable ??= _computeIsNullable();
   bool _computeIsNullable() {
+    force();
+    if (this == _forcedLanguage) {
+      var result = operand.isNullable;
+      _isNullable = null;
+      return result;
+    }
     //suppose false, before traversing children
     _isNullable = false;
-    var result = force().isNullable;
+    var result = _forcedLanguage!.isNullable;
     //clear the cache
     _isNullable = null;
     return result;
@@ -350,9 +356,11 @@ class Delayed extends Language {
     if (_forcedLanguage != null) return _forcedLanguage!;
     if (operand is Delayed) {
       var forcedOperand = (operand as Delayed).force();
-      return _forcedLanguage = forcedOperand.derivative(token);
+      _forcedLanguage = forcedOperand.derivative(token);
+    } else {
+      _forcedLanguage = operand.derivative(token);
     }
-    return _forcedLanguage = operand.derivative(token);
+    return _forcedLanguage! == this ? _forcedLanguage = this : _forcedLanguage!;
   }
 
   @override
@@ -367,7 +375,8 @@ class Delayed extends Language {
   @override
   String computeTGF(Map<Language, String> map) {
     if (map[this] != null) return '';
-    map[this] = '${identityHashCode(this)} Δ($token)';
+    map[this] =
+        '${identityHashCode(this)} Δ($token)[${identityHashCode(this)}]';
     var opL = operand.computeTGF(map);
     return '$opL\n${identityHashCode(this)} ${identityHashCode(operand)}\n';
   }
