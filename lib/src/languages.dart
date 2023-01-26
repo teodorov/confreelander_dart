@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:confreelander/confreelander.dart';
 import 'smart_constructors.dart';
 
@@ -15,6 +17,15 @@ abstract class Language {
 
   bool get isNullable;
   bool get isProductive => false;
+
+  String computeTGF(Map<Language, String> map);
+  toTGF() {
+    Map<Language, String> nodeMap =
+        HashMap(equals: identical, hashCode: identityHashCode);
+    String links = this.computeTGF(nodeMap);
+    String nodes = nodeMap.values.join('\n');
+    return '0 0\n$nodes\n#\n0 ${identityHashCode(this)}\n$links';
+  }
 }
 
 /// a Terminal parser does not contain sub-parsers
@@ -35,6 +46,13 @@ class Empty extends Terminal {
 
   @override
   String toString() => '∅';
+
+  @override
+  String computeTGF(Map<Language, String> map) {
+    if (map[this] != null) return '';
+    map[this] = '${identityHashCode(this)} ∅';
+    return '';
+  }
 }
 
 class Epsilon extends Terminal {
@@ -52,6 +70,13 @@ class Epsilon extends Terminal {
 
   @override
   String toString() => 'ε';
+
+  @override
+  String computeTGF(Map<Language, String> map) {
+    if (map[this] != null) return '';
+    map[this] = '${identityHashCode(this)} ϵ';
+    return '';
+  }
 }
 
 class Token extends Terminal {
@@ -74,6 +99,13 @@ class Token extends Terminal {
   @override
   bool operator ==(Object other) {
     return super == other || (other is Token && token == other.token);
+  }
+
+  @override
+  String computeTGF(Map<Language, String> map) {
+    if (map[this] != null) return '';
+    map[this] = '${identityHashCode(this)} T($token)';
+    return '';
   }
 }
 
@@ -102,6 +134,15 @@ class Union extends Composite {
     return super == other ||
         (other is Union && lhs == other.lhs && rhs == other.rhs);
   }
+
+  @override
+  String computeTGF(Map<Language, String> map) {
+    if (map[this] != null) return '';
+    map[this] = '${identityHashCode(this)} |';
+    var lhsL = lhs.computeTGF(map);
+    var rhsL = rhs.computeTGF(map);
+    return '$lhsL\n$rhsL\n${identityHashCode(this)} ${identityHashCode(lhs)}\n${identityHashCode(this)} ${identityHashCode(rhs)}\n';
+  }
 }
 
 class Concatenation extends Composite {
@@ -128,6 +169,15 @@ class Concatenation extends Composite {
     return super == other ||
         (other is Concatenation && lhs == other.lhs && rhs == other.rhs);
   }
+
+  @override
+  String computeTGF(Map<Language, String> map) {
+    if (map[this] != null) return '';
+    map[this] = '${identityHashCode(this)} ∘';
+    var lhsL = lhs.computeTGF(map);
+    var rhsL = rhs.computeTGF(map);
+    return '$lhsL\n$rhsL\n${identityHashCode(this)} ${identityHashCode(lhs)}\n${identityHashCode(this)} ${identityHashCode(rhs)}\n';
+  }
 }
 
 class Delta extends Composite {
@@ -150,6 +200,14 @@ class Delta extends Composite {
   @override
   bool operator ==(Object other) {
     return super == other || (other is Delta && operand == other.operand);
+  }
+
+  @override
+  String computeTGF(Map<Language, String> map) {
+    if (map[this] != null) return '';
+    map[this] = '${identityHashCode(this)} δ';
+    var opL = operand.computeTGF(map);
+    return '$opL\n${identityHashCode(this)} ${identityHashCode(operand)}\n';
   }
 }
 
@@ -175,7 +233,7 @@ class Reference extends Composite {
       return _derivative!;
     }
     _token = token;
-    _derivative = Delayed(target, token);
+    _derivative = target.delayed(token);
     return _derivative!;
   }
 
@@ -226,6 +284,14 @@ class Reference extends Composite {
   bool operator ==(Object other) {
     return super == other ||
         (other is Reference && name == other.name && target == other.target);
+  }
+
+  @override
+  String computeTGF(Map<Language, String> map) {
+    if (map[this] != null) return '';
+    map[this] = '${identityHashCode(this)} R($name)';
+    var targetL = target.computeTGF(map);
+    return '$targetL\n${identityHashCode(this)} ${identityHashCode(target)}\n';
   }
 }
 
@@ -294,5 +360,13 @@ class Delayed extends Language {
   bool operator ==(Object other) {
     return super == other ||
         (other is Delayed && operand == other.operand && token == other.token);
+  }
+
+  @override
+  String computeTGF(Map<Language, String> map) {
+    if (map[this] != null) return '';
+    map[this] = '${identityHashCode(this)} Δ($token)';
+    var opL = operand.computeTGF(map);
+    return '$opL\n${identityHashCode(this)} ${identityHashCode(operand)}\n';
   }
 }
