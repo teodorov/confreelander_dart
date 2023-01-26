@@ -1,4 +1,4 @@
-import 'package:confreelander/src/stupid_constructors.dart';
+import 'package:confreelander/src/smart_constructors.dart';
 import 'package:test/test.dart';
 
 void main() {

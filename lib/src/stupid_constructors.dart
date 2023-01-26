@@ -1,4 +1,4 @@
-import 'languages.dart';
+import 'stupid_languages.dart';
 
 Language empty = Empty();
 Language eps() => Epsilon();

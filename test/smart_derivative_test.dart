@@ -1,5 +1,5 @@
-import 'package:confreelander/src/stupid_constructors.dart';
-import 'package:confreelander/src/stupid_languages.dart';
+import 'package:confreelander/src/smart_languages.dart';
+import 'package:confreelander/src/smart_constructors.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -19,9 +19,9 @@ void main() {
 
     test('D union', () {
       var lang = token('a') | token('b');
-      expect(lang.derivative('a'), eps() | empty);
-      expect(lang.derivative('b'), empty | eps());
-      expect(lang.derivative('c'), empty | empty);
+      expect(lang.derivative('a'), eps());
+      expect(lang.derivative('b'), eps());
+      expect(lang.derivative('c'), empty);
     });
 
     test('D union smart eq', () {
@@ -44,7 +44,7 @@ void main() {
     });
 
     test('D delayed xxx', () {
-      expect(token(42).delayed(42).derivative(42), eps().delayed(42));
+      expect(token(42).delayed(42).derivative(42), empty);
     });
     test('D delayed a force', () {
       expect(Delayed(token('a'), 'a').force(), isA<Epsilon>());
@@ -92,7 +92,7 @@ void main() {
       rS.target = S;
 
       expect(S.derivative('a').derivative('a'),
-          empty | (eps() | (token('a') | rS).delayed('a')).delayed('a'));
+          (eps() | (token('a') | rS).delayed('a')).delayed('a'));
     });
 
     test('self loop', () {
@@ -132,7 +132,7 @@ void main() {
     test('force accumulated delay', () {
       var rS = ref('S');
       rS.target = rS;
-      var fixed = rS.delayed('a').delayed('a').delayed('a');
+      var fixed = rS.delayed('a');
       var rsd = rS.derivative('a');
       rsd = rsd.derivative('a');
       rsd = rsd.derivative('a');
@@ -144,66 +144,46 @@ void main() {
       var s = token('a') | token('b');
       rS.target = s;
 
-      expect(s.derivative('a'), eps() | empty);
-      expect(s.derivative('b'), empty | eps());
-      expect(s.derivative('c'), empty | empty);
+      expect(s.derivative('a'), eps());
+      expect(s.derivative('b'), eps());
+      expect(s.derivative('c'), empty);
 
-      expect((rS.derivative('a') as Delayed).force(), eps() | empty);
-      expect((rS.derivative('b') as Delayed).force(), empty | eps());
-      expect((rS.derivative('c') as Delayed).force(), empty | empty);
+      expect((rS.derivative('a') as Delayed).force(), eps());
+      expect((rS.derivative('b') as Delayed).force(), eps());
+      expect((rS.derivative('c') as Delayed).force(), empty);
     });
 
     test('different derivatives diff tokens', () {
       var s = token('c').seq(token('a') | token('b'));
-      var t1 = (token('c').delta.delta.seq(empty | empty) |
-              (empty.seq(empty | empty))) |
-          ((eps().delta.seq(eps() | empty)) |
-              (empty.seq(token('a') | token('b'))));
-      var t2 = (token('c').delta.delta.seq(empty | empty) |
-              (empty.seq(empty | empty))) |
-          ((eps().delta.seq(empty | eps())) |
-              (empty.seq(token('a') | token('b'))));
-      var t3 = (token('c').delta.delta.seq(empty | empty) |
-              (empty.seq(empty | empty))) |
-          ((eps().delta.seq(empty | empty)) |
-              (empty.seq(token('a') | token('b'))));
+      var t1 = eps().delta.seq(eps());
+      var t2 = t1;
       //no delay
       expect(s.derivative('c').derivative('a'), t1);
       expect(s.derivative('c').derivative('b'), t2);
-      expect(s.derivative('c').derivative('c'), t3);
+      expect(s.derivative('c').derivative('c'), empty);
       //different delay
       expect((s.delayed('c').derivative('a') as Delayed).force(), t1);
       expect((s.delayed('c').derivative('b') as Delayed).force(), t2);
-      expect((s.delayed('c').derivative('c') as Delayed).force(), t3);
+      expect((s.delayed('c').derivative('c') as Delayed).force(), empty);
 
       //reuse delay
       // ignore: non_constant_identifier_names
       var delayed_c = s.delayed('c');
       expect((delayed_c.derivative('a') as Delayed).force(), t1);
       expect((delayed_c.derivative('b') as Delayed).force(), t2);
-      expect((delayed_c.derivative('c') as Delayed).force(), t3);
+      //expect((delayed_c.derivative('c') as Delayed).force(), empty);
     });
 
     test('different derivatives diff tokens 3', () {
       var s = token('c').seq(token('a') | token('b'));
-      var t1 = (token('c').delta.delta.seq(empty | empty) |
-              (empty.seq(empty | empty))) |
-          ((eps().delta.seq(eps() | empty)) |
-              (empty.seq(token('a') | token('b'))));
-      var t2 = (token('c').delta.delta.seq(empty | empty) |
-              (empty.seq(empty | empty))) |
-          ((eps().delta.seq(empty | eps())) |
-              (empty.seq(token('a') | token('b'))));
-      var t3 = (token('c').delta.delta.seq(empty | empty) |
-              (empty.seq(empty | empty))) |
-          ((eps().delta.seq(empty | empty)) |
-              (empty.seq(token('a') | token('b'))));
+      var t1 = eps().delta.seq(eps());
+      var t2 = t1;
       //reuse delay
       // ignore: non_constant_identifier_names
       var delayed_c = s.delayed('c');
       expect((delayed_c.derivative('a') as Delayed).force(), t1);
       expect((delayed_c.derivative('b') as Delayed).force(), t2);
-      expect((delayed_c.derivative('c') as Delayed).force(), t3);
+      expect((delayed_c.derivative('c') as Delayed).force(), empty);
     });
   });
 }

@@ -1,7 +1,5 @@
 import 'dart:collection';
-
-import 'package:confreelander/confreelander.dart';
-import 'smart_constructors.dart';
+import 'stupid_constructors.dart';
 
 abstract class Language {
   const Language();
@@ -91,7 +89,7 @@ class Token extends Terminal {
   bool get isProductive => true;
 
   @override
-  String toString() => 'Token($token)';
+  String toString() => '(Token $token)';
 
   @override
   int get hashCode => Object.hash(runtimeType, token);
@@ -124,7 +122,7 @@ class Union extends Composite {
   @override
   bool get isProductive => lhs.isProductive || rhs.isProductive;
   @override
-  String toString() => '$lhs | $rhs';
+  String toString() => '($lhs | $rhs)';
 
   @override
   int get hashCode => Object.hash(runtimeType, lhs, rhs);
@@ -157,7 +155,7 @@ class Concatenation extends Composite {
   @override
   bool get isProductive => lhs.isProductive && rhs.isProductive;
   @override
-  String toString() => '$lhs ∘ $rhs';
+  String toString() => '($lhs ∘ $rhs)';
 
   @override
   int get hashCode {
@@ -192,7 +190,7 @@ class Delta extends Composite {
   bool get isProductive => operand.isProductive;
 
   @override
-  String toString() => 'δ($operand)';
+  String toString() => '(δ $operand)';
 
   @override
   int get hashCode => Object.hash(runtimeType, operand);
@@ -262,7 +260,7 @@ class Reference extends Composite {
   }
 
   @override
-  String toString() => 'ref($name)';
+  String toString() => '(ref $name)';
 
   //we cannot get fixedpoint here, because the ints are not a lattice
   //but a hash based on the name and the target language hash should be good enough
@@ -350,7 +348,7 @@ class Delayed extends Language {
   }
 
   @override
-  String toString() => 'delayed($operand, $token)';
+  String toString() => '(delayed $operand $token)';
 
   Language force() {
     if (_forcedLanguage != null) return _forcedLanguage!;

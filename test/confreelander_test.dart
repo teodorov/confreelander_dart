@@ -1,5 +1,5 @@
-import 'package:confreelander/confreelander.dart';
 import 'package:confreelander/src/smart_constructors.dart';
+import 'package:confreelander/src/smart_languages.dart';
 
 import 'package:test/test.dart';
 
@@ -77,6 +77,5 @@ void main() {
       expect(token(2).ref('m'), isA<Reference>());
       expect((token(2).ref('m') as Reference).target, isA<Token>());
     });
-    test('', () {});
   });
 }
