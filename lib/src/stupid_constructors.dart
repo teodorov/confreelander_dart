@@ -23,8 +23,8 @@ extension SmartConstructors on Language {
 
   Language get delta => Delta(this);
 
-  Language delayed(Object token) {
-    return Delayed(this, token);
+  Language delayed() {
+    return Delayed(this);
   }
 
   Language ref(String name) => isEmpty ? empty : Reference(name, this);

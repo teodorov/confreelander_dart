@@ -6,7 +6,9 @@ abstract class Language {
 
   bool includes(Iterator it) {
     if (!it.moveNext()) return isNullable;
-    return derivative(it.current).includes(it);
+    var der = derivative(it.current);
+    if (!der.isNullable) return false;
+    return der.includes(it);
   }
 
   get isEmpty => this == empty;
@@ -217,22 +219,20 @@ class Reference extends Composite {
     this.target = target;
   }
 
-  Language? _derivative;
-  Object? _token;
+  Delayed? _delayed;
   bool? _isNullable;
   bool? _isProductive;
   int? _hashCode;
 
-  ///needs memoization since D S = D S
-  ///memoize just one derivative and one token
   @override
   Language derivative(Object token) {
-    if (_token != null && _token == token && _derivative != null) {
-      return _derivative!;
+    if (_delayed != null) {
+      return _delayed!;
     }
-    _token = token;
-    _derivative = target.delayed(token);
-    return _derivative!;
+    _delayed = target.delayed() as Delayed;
+
+    var d = _delayed!.force(token);
+    return d;
   }
 
   ///needs fixed point & memoization
@@ -294,79 +294,28 @@ class Reference extends Composite {
 }
 
 class Delayed extends Language {
-  Delayed(this.operand, this.token);
+  Delayed(this.operand);
   final Language operand;
-  final Object token;
-  Language? _forcedLanguage;
-  Language? _derivative;
-  Object? _token;
-  bool? _isNullable;
-  bool? _isProductive;
 
   ///need memoization
   @override
   Language derivative(Object token) {
-    if (_token != null && _token == token && _derivative != null) {
-      return _derivative!;
-    }
-    _token = token;
-
-    if (_forcedLanguage == this && token == this.token) {
-      return _derivative = this;
-    }
-    return _derivative = force().delayed(token);
+    return force(token);
   }
-
-  bool _visited = false;
 
   ///needs fixed point & memoization
   ///the idea is suppose false, and see if we can get through by traversing the forced language
   @override
-  bool get isNullable => _isNullable ??= _computeIsNullable();
-  bool _computeIsNullable() {
-    force();
-    if (this == _forcedLanguage || _visited) {
-      var result = operand.isNullable;
-      _visited = false;
-      return result;
-    }
-    //suppose false, before traversing children
-    _visited = true;
-    var result = _forcedLanguage!.isNullable;
-    //clear the cache
-    _visited = false;
-    return result;
-  }
+  bool get isNullable => false;
 
   @override
-  bool get isProductive => _isProductive ??= _computeIsProductive();
-  bool _computeIsProductive() {
-    force();
-    if (_visited) {
-      var result = operand.isProductive;
-      _visited = false;
-      return result;
-    }
-    //suppose false, before traversing children
-    _visited = true;
-    var result = _forcedLanguage!.isProductive;
-    //clear the cache
-    _visited = false;
-    return result;
-  }
+  bool get isProductive => false;
 
   @override
   String toString() => '(delayed $operand $token)';
 
-  Language force() {
-    if (_forcedLanguage != null) return _forcedLanguage!;
-    if (operand is Delayed) {
-      var forcedOperand = (operand as Delayed).force();
-      _forcedLanguage = forcedOperand.derivative(token);
-    } else {
-      _forcedLanguage = operand.derivative(token);
-    }
-    return _forcedLanguage! == this ? _forcedLanguage = this : _forcedLanguage!;
+  Language force(Object token) {
+    return operand.derivative(token);
   }
 
   @override
@@ -374,14 +323,13 @@ class Delayed extends Language {
 
   @override
   bool operator ==(Object other) {
-    return super == other ||
-        (other is Delayed && operand == other.operand && token == other.token);
+    return super == other || (other is Delayed && operand == other.operand);
   }
 
   @override
   String computeTGF(Map<Language, String> map) {
     if (map[this] != null) return '';
-    map[this] = '${identityHashCode(this)} Δ($token)';
+    map[this] = '${identityHashCode(this)} Δ';
     var opL = operand.computeTGF(map);
     return '$opL\n${identityHashCode(this)} ${identityHashCode(operand)}\n';
   }

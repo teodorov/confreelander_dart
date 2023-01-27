@@ -40,47 +40,60 @@ void main() {
       var x = token('a') | rx;
       rx.target = x;
 
-      print('\n-----X----\n');
-      File('Lx.tgf').writeAsStringSync(x.toTGF());
+      // print('\n-----X----\n');
+      // File('Lx.tgf').writeAsStringSync(x.toTGF());
 
-      print('\n-----dX----\n');
-      rx = ref('x');
-      x = token('a') | rx;
-      rx.target = x;
-      File('Ldx.tgf').writeAsStringSync(x.derivative('a').toTGF());
+      // print('\n-----dX----\n');
+      // rx = ref('x');
+      // x = token('a') | rx;
+      // rx.target = x;
+      // File('Ldx.tgf').writeAsStringSync(x.derivative('a').toTGF());
 
-      print('\n-----ddX----\n');
-      rx = ref('x');
-      x = token('a') | rx;
-      rx.target = x;
-      File('Ldbx.tgf')
-          .writeAsStringSync(x.derivative('a').derivative('b').toTGF());
+      // print('\n-----bX----\n');
+      // rx = ref('x');
+      // x = token('a') | rx;
+      // rx.target = x;
+      // File('Lbx.tgf').writeAsStringSync(x.derivative('b').toTGF());
 
-      print('\n-----ddX----\n');
-      rx = ref('x');
-      x = token('a') | rx;
-      rx.target = x;
-      File('Lddx.tgf')
-          .writeAsStringSync(x.derivative('a').derivative('a').toTGF());
+      // print('\n-----dbX----\n');
+      // rx = ref('x');
+      // x = token('a') | rx;
+      // rx.target = x;
+      // File('Ldbx.tgf')
+      //     .writeAsStringSync(x.derivative('a').derivative('b').toTGF());
 
-      print('\n-----dddX----\n');
-      rx = ref('x');
-      x = token('a') | rx;
-      rx.target = x;
-      File('Ldddx.tgf').writeAsStringSync(
-          x.derivative('a').derivative('a').derivative('a').toTGF());
+      // print('\n-----ddX----\n');
+      // rx = ref('x');
+      // x = token('a') | rx;
+      // rx.target = x;
+      // File('Lddx.tgf')
+      //     .writeAsStringSync(x.derivative('a').derivative('a').toTGF());
 
-      print('\n-----ddddX----\n');
-      rx = ref('x');
-      x = token('a') | rx;
-      rx.target = x;
+      // print('\n-----dddX----\n');
+      // rx = ref('x');
+      // x = token('a') | rx;
+      // rx.target = x;
+      // File('Ldddx.tgf').writeAsStringSync(
+      //     x.derivative('a').derivative('a').derivative('a').toTGF());
 
-      File('Lddddx.tgf').writeAsStringSync(x
-          .derivative('a')
-          .derivative('a')
-          .derivative('a')
-          .derivative('a')
-          .toTGF());
+      // print('\n-----dbdX----\n');
+      // rx = ref('x');
+      // x = token('a') | rx;
+      // rx.target = x;
+      // File('Ldbdx.tgf').writeAsStringSync(
+      //     x.derivative('a').derivative('b').derivative('a').toTGF());
+
+      // print('\n-----ddddX----\n');
+      // rx = ref('x');
+      // x = token('a') | rx;
+      // rx.target = x;
+
+      // File('Lddddx.tgf').writeAsStringSync(x
+      //     .derivative('a')
+      //     .derivative('a')
+      //     .derivative('a')
+      //     .derivative('a')
+      //     .toTGF());
 
       rx = ref('x');
       x = token('a') | rx;
@@ -90,14 +103,7 @@ void main() {
       x = token('a') | rx;
       rx.target = x;
       expect(x.includes(it('a')), true);
-      rx = ref('x');
-      x = token('a') | rx;
-      rx.target = x;
-      expect(x.includes(it('aa')), true);
-      rx = ref('x');
-      x = token('a') | rx;
-      rx.target = x;
-      expect(x.includes(it('ab')), false);
+
       rx = ref('x');
       x = token('a') | rx;
       rx.target = x;
@@ -106,6 +112,116 @@ void main() {
       x = token('a') | rx;
       rx.target = x;
       expect(x.includes(it('aaaa')), true);
+    });
+
+    test('X = a | X, (d X a)', () {
+      print('\n-----(d X a)----\n');
+      var rx = ref('x');
+      var x = token('a') | rx;
+      rx.target = x;
+      File('dXa.tgf').writeAsStringSync(x.derivative('a').toTGF());
+
+      rx = ref('x');
+      x = token('a') | rx;
+      rx.target = x;
+      expect(x.includes(it('a')), true);
+    });
+
+    test('X = a | X, (d X b)', () {
+      print('\n-----(d X b)----\n');
+      var rx = ref('x');
+      var x = token('a') | rx;
+      rx.target = x;
+      File('dXb.tgf').writeAsStringSync(x.derivative('b').toTGF());
+
+      rx = ref('x');
+      x = token('a') | rx;
+      rx.target = x;
+      expect(x.includes(it('b')), false);
+    });
+
+    test('X = a | X, (d (d X a) a)', () {
+      print('\n-----(d (d X a) a)----\n');
+      var rx = ref('x');
+      var x = token('a') | rx;
+      rx.target = x;
+      File('ddXaa.tgf')
+          .writeAsStringSync(x.derivative('a').derivative('a').toTGF());
+
+      rx = ref('x');
+      x = token('a') | rx;
+      rx.target = x;
+      expect(x.includes(it('aa')), true);
+    });
+
+    test('X = a | X, (d (d X a) b)', () {
+      print('\n-----(d (d X a) b)----\n');
+      var rx = ref('x');
+      var x = token('a') | rx;
+      rx.target = x;
+      File('ddXab.tgf')
+          .writeAsStringSync(x.derivative('a').derivative('b').toTGF());
+
+      rx = ref('x');
+      x = token('a') | rx;
+      rx.target = x;
+      expect(x.includes(it('ab')), false);
+    });
+
+    test('X = a | X, (d (d (d X a) a) a)', () {
+      print('\n-----(d (d (d X a) a) a)----\n');
+      var rx = ref('x');
+      var x = token('a') | rx;
+      rx.target = x;
+      File('dddXaaa.tgf').writeAsStringSync(
+          x.derivative('a').derivative('a').derivative('a').toTGF());
+
+      rx = ref('x');
+      x = token('a') | rx;
+      rx.target = x;
+      expect(x.includes(it('aaa')), true);
+    });
+
+    test('X = a | X, (d (d (d X b) a) a)', () {
+      print('\n-----(d (d (d X b) a) a)----\n');
+      var rx = ref('x');
+      var x = token('a') | rx;
+      rx.target = x;
+      File('dddXaaa.tgf').writeAsStringSync(
+          x.derivative('b').derivative('a').derivative('a').toTGF());
+
+      rx = ref('x');
+      x = token('a') | rx;
+      rx.target = x;
+      expect(x.includes(it('baa')), false);
+    });
+
+    test('X = a | X, (d (d (d X a) b) a)', () {
+      print('\n-----(d (d (d X a) b) a)----\n');
+      var rx = ref('x');
+      var x = token('a') | rx;
+      rx.target = x;
+      File('dddXaba.tgf').writeAsStringSync(
+          x.derivative('a').derivative('b').derivative('a').toTGF());
+
+      rx = ref('x');
+      x = token('a') | rx;
+      rx.target = x;
+      expect(x.includes(it('aba')), false);
+    });
+
+    test('X = a | X, (d (d (d X a) a) b)', () {
+      print('\n-----(d (d (d X a) a) b)----\n');
+      var rx = ref('x');
+      var x = token('a') | rx;
+      rx.target = x;
+      File('dddXaab.tgf').writeAsStringSync(
+          x.derivative('a').derivative('a').derivative('b').toTGF());
+
+      rx = ref('x');
+      x = token('a') | rx;
+      rx.target = x;
+      expect(x.includes(it('aab')), false);
     });
 
     test('regular direct recursive X = a | X, no copy', () {
@@ -272,6 +388,56 @@ void main() {
 
       expect(a.includes(it('ababab')), true);
       expect(a.includes(it('aba')), true);
+    });
+
+    test('E = e | S. S = s | E, (d E e)', () {
+      var rE = ref('E');
+      var rS = ref('S');
+      var e = token('e') | rS;
+      var s = token('s') | rE;
+      rE.target = e;
+      rS.target = s;
+
+      print('\n-----(d E e)----\n');
+      File('dEe.tgf').writeAsStringSync(e.derivative('e').toTGF());
+
+      expect(e.includes(it('e')), true);
+    });
+
+    test('E = e | S. S = s | E, (d (d E e) s)', () {
+      var rE = ref('E');
+      var rS = ref('S');
+      var e = token('e') | rS;
+      var s = token('s') | rE;
+      rE.target = e;
+      rS.target = s;
+
+      print('\n-----(d (d E e) s)----\n');
+      File('ddEes.tgf')
+          .writeAsStringSync(e.derivative('e').derivative('s').toTGF());
+
+      rE = ref('E');
+      rS = ref('S');
+      e = token('e') | rS;
+      s = token('s') | rE;
+      rE.target = e;
+      rS.target = s;
+      expect(e.includes(it('es')), true);
+    });
+
+    test('E = e | S. S = s | E, (d (d E e) e)', () {
+      var rE = ref('E');
+      var rS = ref('S');
+      var e = token('e') | rS;
+      var s = token('s') | rE;
+      rE.target = e;
+      rS.target = s;
+
+      print('\n-----(d (d E e) e)----\n');
+      File('ddEee.tgf')
+          .writeAsStringSync(e.derivative('e').derivative('e').toTGF());
+
+      expect(e.includes(it('ee')), true);
     });
 
     test('mutually direct recursive', () {
