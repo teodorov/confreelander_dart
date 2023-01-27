@@ -4,7 +4,7 @@ import 'package:test/test.dart';
 void main() {
   group('productivity', () {
     test('empty.isProductive', () {
-      expect(empty.isProductive, false);
+      expect(empty().isProductive, false);
     });
 
     test('ϵ.isProductive', () {
@@ -47,17 +47,17 @@ void main() {
     });
 
     test('(ϵ | t(3)) ∘ (∅ | ϵ)', () {
-      var l = (eps() | token(3)).seq(empty | eps());
+      var l = (eps() | token(3)).seq(empty() | eps());
       expect(l.isProductive, true);
     });
 
     test('(ϵ | t(3)) ∘ (∅ | ∅)', () {
-      var l = (eps() | token(3)).seq(empty | empty);
+      var l = (eps() | token(3)).seq(empty() | empty());
       expect(l.isProductive, false);
     });
 
     test('delta ∅ .isProductive', () {
-      var l = empty.delta;
+      var l = empty().delta;
       expect(l.isProductive, false);
     });
 
@@ -72,27 +72,27 @@ void main() {
     });
 
     test('∅.delayed(2) .isProductive', () {
-      var l = empty.delayed(2);
+      var l = empty().delayed();
       expect(l.isProductive, false);
     });
 
     test('ϵ.delayed(2) .isProductive', () {
-      var l = eps().delayed(2);
+      var l = eps().delayed();
       expect(l.isProductive, false);
     });
 
     test('tok(3).delayed(2) .isProductive', () {
-      var l = token(3).delayed(2);
+      var l = token(3).delayed();
       expect(l.isProductive, false);
     });
 
     test('tok(3).delayed(3) .isProductive', () {
-      var l = token(3).delayed(3);
+      var l = token(3).delayed();
       expect(l.isProductive, true);
     });
 
     test('tok(3).delayed(3).delayed(3) .isProductive', () {
-      var l = token(3).delayed(3).delayed(3);
+      var l = token(3).delayed().delayed();
       expect(l.isProductive, false);
     });
 

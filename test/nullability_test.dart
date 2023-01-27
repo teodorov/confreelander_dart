@@ -1,10 +1,11 @@
+import 'package:confreelander/confreelander.dart';
 import 'package:confreelander/src/stupid_constructors.dart';
 import 'package:test/test.dart';
 
 void main() {
   group('nullability', () {
     test('empty.isNullable', () {
-      expect(empty.isNullable, false);
+      expect(empty().isNullable, false);
     });
     test('ϵ.isNullable', () {
       expect(eps().isNullable, true);
@@ -46,25 +47,25 @@ void main() {
     });
 
     test('(ϵ | t(3)) ∘ (∅ | ϵ)', () {
-      var l = (eps() | token(3)).seq(empty | eps());
+      var l = (eps() | token(3)).seq(empty() | eps());
       expect(l.isNullable, true);
     });
 
     test('(ϵ | t(3)) ∘ (∅ | ∅)', () {
-      var l = (eps() | token(3)).seq(empty | empty);
+      var l = (eps() | token(3)).seq(empty() | empty());
       expect(l.isNullable, false);
     });
 
     test('(ϵ | t(3)) ∘ (∅ | ∅)* .isNullable', () {
       var rI = ref('I');
-      var i = eps() | (empty | empty).seq(rI);
+      var i = eps() | (empty() | empty()).seq(rI);
       rI.target = i;
       var l = (eps() | token(3)).seq(rI);
       expect(l.isNullable, true);
     });
 
     test('delta ∅ .isNullable', () {
-      var l = empty.delta;
+      var l = empty().delta;
       expect(l.isNullable, false);
     });
 
@@ -79,22 +80,22 @@ void main() {
     });
 
     test('∅.delayed(2) .isNullable', () {
-      var l = empty.delayed(2);
+      var l = empty().delayed();
       expect(l.isNullable, false);
     });
 
     test('ϵ.delayed(2) .isNullable', () {
-      var l = eps().delayed(2);
+      var l = eps().delayed();
       expect(l.isNullable, false);
     });
 
     test('tok(3).delayed(2) .isNullable', () {
-      var l = token(3).delayed(2);
+      var l = token(3).delayed();
       expect(l.isNullable, false);
     });
 
     test('tok(3).delayed(3) .isNullable', () {
-      var l = token(3).delayed(3);
+      var l = (token(3).delayed() as Delayed).force(3);
       expect(l.isNullable, true);
     });
 

@@ -11,9 +11,19 @@ abstract class Language {
     return der.includes(it);
   }
 
-  get isEmpty => this == empty;
+  get isEmpty => this == empty();
 
-  Language derivative(Object token);
+  Language derivative(Object token) {
+    var start = Queue<Language>();
+    var visited = Queue<Map<Language, Language>>();
+    start.add(this);
+    visited.add({});
+    derivate(token, start, visited);
+    return visited.last[this]!;
+  }
+
+  void derivate(Object token, Queue<Language> start,
+      Queue<Map<Language, Language>> visited);
 
   bool get isNullable;
   bool get isProductive => false;
@@ -26,6 +36,8 @@ abstract class Language {
     String nodes = nodeMap.values.join('\n');
     return '0 0\n$nodes\n#\n0 ${identityHashCode(this)}\n$links';
   }
+
+  Iterable<Language> operands();
 }
 
 /// a Terminal parser does not contain sub-parsers
@@ -34,13 +46,6 @@ abstract class Terminal extends Language {
 }
 
 class Empty extends Terminal {
-  const Empty._create();
-  static const Empty emptyI = Empty._create();
-  factory Empty() => emptyI;
-
-  @override
-  Language derivative(Object token) => empty;
-
   @override
   bool get isNullable => false;
 
@@ -53,16 +58,20 @@ class Empty extends Terminal {
     map[this] = '${identityHashCode(this)} ∅';
     return '';
   }
+
+  @override
+  Iterable<Language> operands() {
+    return {};
+  }
+
+  @override
+  void derivate(Object token, Queue<Language> start,
+      Queue<Map<Language, Language>> visited) {
+    visited.last[this] = empty();
+  }
 }
 
 class Epsilon extends Terminal {
-  const Epsilon._create();
-  static const Epsilon epsI = Epsilon._create();
-  factory Epsilon() => epsI;
-
-  @override
-  Language derivative(Object token) => empty;
-
   @override
   bool get isNullable => true;
   @override
@@ -77,13 +86,22 @@ class Epsilon extends Terminal {
     map[this] = '${identityHashCode(this)} ϵ';
     return '';
   }
+
+  @override
+  Iterable<Language> operands() {
+    return {};
+  }
+
+  @override
+  void derivate(Object token, Queue<Language> start,
+      Queue<Map<Language, Language>> visited) {
+    visited.last[this] = empty();
+  }
 }
 
 class Token extends Terminal {
   Token(this.token);
   final Object token;
-  @override
-  Language derivative(Object token) => this.token == token ? eps() : empty;
 
   @override
   bool get isNullable => false;
@@ -107,6 +125,17 @@ class Token extends Terminal {
     map[this] = '${identityHashCode(this)} T($token)';
     return '';
   }
+
+  @override
+  Iterable<Language> operands() {
+    return {};
+  }
+
+  @override
+  void derivate(Object token, Queue<Language> start,
+      Queue<Map<Language, Language>> visited) {
+    visited.last[this] = this.token == token ? eps() : empty();
+  }
 }
 
 /// A composite parser encapsulates at least another parser
@@ -115,9 +144,6 @@ abstract class Composite extends Language {}
 class Union extends Composite {
   Union(this.lhs, this.rhs);
   final Language lhs, rhs;
-  @override
-  Language derivative(Object token) =>
-      lhs.derivative(token) | rhs.derivative(token);
 
   @override
   bool get isNullable => lhs.isNullable || rhs.isNullable;
@@ -143,14 +169,24 @@ class Union extends Composite {
     var rhsL = rhs.computeTGF(map);
     return '$lhsL\n$rhsL\n${identityHashCode(this)} ${identityHashCode(lhs)}\n${identityHashCode(this)} ${identityHashCode(rhs)}\n';
   }
+
+  @override
+  Iterable<Language> operands() {
+    return {lhs, rhs};
+  }
+
+  @override
+  void derivate(Object token, Queue<Language> start,
+      Queue<Map<Language, Language>> visited) {
+    lhs.derivate(token, start, visited);
+    rhs.derivate(token, start, visited);
+    visited.last[this] = visited.last[lhs]! | visited.last[rhs]!;
+  }
 }
 
 class Concatenation extends Composite {
   Concatenation(this.lhs, this.rhs);
   final Language lhs, rhs;
-  @override
-  Language derivative(Object token) =>
-      lhs.delta.seq(rhs.derivative(token)) | lhs.derivative(token).seq(rhs);
 
   @override
   bool get isNullable => lhs.isNullable && rhs.isNullable;
@@ -178,13 +214,26 @@ class Concatenation extends Composite {
     var rhsL = rhs.computeTGF(map);
     return '$lhsL\n$rhsL\n${identityHashCode(this)} ${identityHashCode(lhs)}\n${identityHashCode(this)} ${identityHashCode(rhs)}\n';
   }
+
+  @override
+  Iterable<Language> operands() {
+    return {lhs, rhs};
+  }
+
+  @override
+  void derivate(Object token, Queue<Language> start,
+      Queue<Map<Language, Language>> visited) {
+    lhs.derivate(token, start, visited);
+    rhs.derivate(token, start, visited);
+    var dlhs = visited.last[lhs]!;
+    var drhs = visited.last[rhs]!;
+    visited.last[this] = lhs.delta.seq(drhs) | dlhs.seq(rhs);
+  }
 }
 
 class Delta extends Composite {
   Delta(this.operand);
   final Language operand;
-  @override
-  Language derivative(Object token) => empty;
 
   @override
   bool get isNullable => operand.isNullable;
@@ -209,12 +258,23 @@ class Delta extends Composite {
     var opL = operand.computeTGF(map);
     return '$opL\n${identityHashCode(this)} ${identityHashCode(operand)}\n';
   }
+
+  @override
+  Iterable<Language> operands() {
+    return {operand};
+  }
+
+  @override
+  void derivate(Object token, Queue<Language> start,
+      Queue<Map<Language, Language>> visited) {
+    visited.last[this] = empty();
+  }
 }
 
 class Reference extends Composite {
-  Reference(this.name, [this.target = Empty.emptyI]);
+  Reference(this.name);
   final String name;
-  Language target;
+  Language target = empty();
   set setTarget(Language target) {
     this.target = target;
   }
@@ -223,17 +283,6 @@ class Reference extends Composite {
   bool? _isNullable;
   bool? _isProductive;
   int? _hashCode;
-
-  @override
-  Language derivative(Object token) {
-    if (_delayed != null) {
-      return _delayed!;
-    }
-    _delayed = target.delayed() as Delayed;
-
-    var d = _delayed!.force(token);
-    return d;
-  }
 
   ///needs fixed point & memoization
   ///the idea is suppose false, and see if we can get through by traversing the target
@@ -291,20 +340,48 @@ class Reference extends Composite {
     var targetL = target.computeTGF(map);
     return '$targetL\n${identityHashCode(this)} ${identityHashCode(target)}\n';
   }
+
+  @override
+  Iterable<Language> operands() {
+    return {target};
+  }
+
+  @override
+  void derivate(Object token, Queue<Language> start,
+      Queue<Map<Language, Language>> visited) {
+    if (start.last == this) {
+      if (visited.last[this] == null) {
+        start.add(this);
+        visited.add({this: target.delayed()});
+        target.derivate(token, start, visited);
+        return;
+      }
+      var dTarget = visited.last[target]!;
+      start.removeLast();
+      visited.removeLast();
+      visited.last[target] = dTarget;
+      return;
+    }
+    if (visited.last[this] != null) {
+      return;
+    }
+    visited.last[this] = target.delayed();
+    target.derivate(token, start, visited);
+    visited.last[this] = visited.last[target]!;
+  }
 }
 
 class Delayed extends Language {
   Delayed(this.operand);
   final Language operand;
 
-  ///need memoization
   @override
-  Language derivative(Object token) {
-    return force(token);
+  void derivate(Object token, Queue<Language> start,
+      Queue<Map<Language, Language>> visited) {
+    operand.derivate(token, start, visited);
+    visited.last[this] = visited.last[operand]!;
   }
 
-  ///needs fixed point & memoization
-  ///the idea is suppose false, and see if we can get through by traversing the forced language
   @override
   bool get isNullable => false;
 
@@ -332,5 +409,10 @@ class Delayed extends Language {
     map[this] = '${identityHashCode(this)} Δ';
     var opL = operand.computeTGF(map);
     return '$opL\n${identityHashCode(this)} ${identityHashCode(operand)}\n';
+  }
+
+  @override
+  Iterable<Language> operands() {
+    return {operand};
   }
 }

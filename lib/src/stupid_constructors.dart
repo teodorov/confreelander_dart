@@ -1,6 +1,6 @@
 import 'stupid_languages.dart';
 
-Language empty = Empty();
+Language empty() => Empty();
 Language eps() => Epsilon();
 
 Language token(Object o) => Token(o);
@@ -27,7 +27,12 @@ extension SmartConstructors on Language {
     return Delayed(this);
   }
 
-  Language ref(String name) => isEmpty ? empty : Reference(name, this);
+  Language ref(String name) {
+    if (isEmpty) return empty();
+    var r = Reference(name);
+    r.target = this;
+    return r;
+  }
 }
 
 extension ConFreeLanDer on Object {
