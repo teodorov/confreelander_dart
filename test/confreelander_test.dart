@@ -60,8 +60,8 @@ void main() {
       var b = Empty();
       expect(identical(a, b), true);
 
-      var c = empty;
-      var d = empty;
+      var c = empty();
+      var d = empty();
       expect(identical(c, d), true);
       expect(identical(c, a), true);
     });
@@ -73,7 +73,7 @@ void main() {
       expect(identical(a, b), true);
     });
     test('reference', () {
-      expect(identical(empty.ref('r'), empty), true);
+      expect(identical(empty().ref('r'), empty()), true);
       expect(token(2).ref('m'), isA<Reference>());
       expect((token(2).ref('m') as Reference).target, isA<Token>());
     });

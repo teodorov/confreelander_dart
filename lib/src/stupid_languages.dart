@@ -1,5 +1,5 @@
 import 'dart:collection';
-import 'stupid_constructors.dart';
+import 'smart_constructors_1.dart';
 
 abstract class Language {
   const Language();
@@ -7,7 +7,6 @@ abstract class Language {
   bool includes(Iterator it) {
     if (!it.moveNext()) return isNullable;
     var der = derivative(it.current);
-    if (!der.isNullable) return false;
     return der.includes(it);
   }
 
@@ -65,6 +64,14 @@ class Empty extends Terminal {
   }
 
   @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    return other is Empty;
+  }
+
+  @override
   void derivate(Object token, Queue<Language> start,
       Queue<Map<Language, Language>> visited) {
     visited.last[this] = empty();
@@ -96,6 +103,14 @@ class Epsilon extends Terminal {
   void derivate(Object token, Queue<Language> start,
       Queue<Map<Language, Language>> visited) {
     visited.last[this] = empty();
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    return other is Epsilon;
   }
 }
 
@@ -349,22 +364,31 @@ class Reference extends Composite {
   @override
   void derivate(Object token, Queue<Language> start,
       Queue<Map<Language, Language>> visited) {
-    if (start.last == this) {
-      if (visited.last[this] == null) {
-        start.add(this);
-        visited.add({this: target.delayed()});
-        target.derivate(token, start, visited);
-        return;
-      }
-      var dTarget = visited.last[target]!;
-      start.removeLast();
-      visited.removeLast();
-      visited.last[target] = dTarget;
-      return;
-    }
+    // if (start.last == this) {
+    //   if (visited.last[this] == null) {
+    //     start.add(this);
+    //     visited.add({this: target.delayed()});
+    //     target.derivate(token, start, visited);
+    //     return;
+    //   }
+    //   var dTarget = visited.last[target]!;
+    //   start.removeLast();
+    //   visited.removeLast();
+    //   visited.last[target] = dTarget;
+    //   return;
+    // }
     if (visited.last[this] != null) {
       return;
     }
+
+    // start.add(this);
+    // visited.addLast({this: target.delayed()});
+    // target.derivate(token, start, visited);
+    // var dTarget = visited.last[target]!;
+    // start.removeLast();
+    // visited.removeLast();
+    // visited.last[this] = dTarget;
+    //-----------
     visited.last[this] = target.delayed();
     target.derivate(token, start, visited);
     visited.last[this] = visited.last[target]!;
@@ -375,6 +399,8 @@ class Delayed extends Language {
   Delayed(this.operand);
   final Language operand;
 
+  bool? _isNullable;
+
   @override
   void derivate(Object token, Queue<Language> start,
       Queue<Map<Language, Language>> visited) {
@@ -383,13 +409,21 @@ class Delayed extends Language {
   }
 
   @override
-  bool get isNullable => false;
+  bool get isNullable => _isNullable ??= _computeIsNullable();
+  bool _computeIsNullable() {
+    //suppose false, before traversing children
+    _isNullable = false;
+    var result = operand.isNullable;
+    //clear the cache
+    _isNullable = null;
+    return result;
+  }
 
   @override
   bool get isProductive => false;
 
   @override
-  String toString() => '(delayed $operand $token)';
+  String toString() => '(delayed $operand)';
 
   Language force(Object token) {
     return operand.derivative(token);

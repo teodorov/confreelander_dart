@@ -5,15 +5,15 @@ import 'package:test/test.dart';
 void main() {
   group('derivative', () {
     test('D empty', () {
-      expect(identical(empty, empty.derivative(23)), true);
+      expect(identical(empty(), empty().derivative(23)), true);
     });
 
     test('D epsilon', () {
-      expect(identical(eps().derivative(23), empty), true);
+      expect(identical(eps().derivative(23), empty()), true);
     });
 
     test('D token', () {
-      expect(identical(token(23).derivative(42), empty), true);
+      expect(identical(token(23).derivative(42), empty()), true);
       expect(token(23).derivative(23), isA<Epsilon>());
     });
 
@@ -21,14 +21,14 @@ void main() {
       var lang = token('a') | token('b');
       expect(lang.derivative('a'), eps());
       expect(lang.derivative('b'), eps());
-      expect(lang.derivative('c'), empty);
+      expect(lang.derivative('c'), empty());
     });
 
     test('D union smart eq', () {
       var lang = token('a') | token('b');
-      expect(eps() | empty, lang.derivative('a'));
-      expect(empty | eps(), lang.derivative('b'));
-      expect(empty | empty, lang.derivative('c'));
+      expect(eps() | empty(), lang.derivative('a'));
+      expect(empty() | eps(), lang.derivative('b'));
+      expect(empty() | empty(), lang.derivative('c'));
     });
 
     test('D concat', () {
@@ -40,15 +40,15 @@ void main() {
     });
 
     test('D delta', () {
-      expect(identical(token('42').delta.derivative(23), empty), true);
+      expect(identical(token('42').delta.derivative(23), empty()), true);
     });
 
     test('D delayed xxx', () {
-      expect(token(42).delayed(42).derivative(42), empty);
+      expect(token(42).delayed(42).derivative(42), empty());
     });
     test('D delayed a force', () {
       expect(Delayed(token('a'), 'a').force(), isA<Epsilon>());
-      expect(Delayed(token('a'), 'b').force(), empty);
+      expect(Delayed(token('a'), 'b').force(), empty());
     });
 
     test('D delayed a∘b toString', () {
@@ -146,11 +146,11 @@ void main() {
 
       expect(s.derivative('a'), eps());
       expect(s.derivative('b'), eps());
-      expect(s.derivative('c'), empty);
+      expect(s.derivative('c'), empty());
 
       expect((rS.derivative('a') as Delayed).force(), eps());
       expect((rS.derivative('b') as Delayed).force(), eps());
-      expect((rS.derivative('c') as Delayed).force(), empty);
+      expect((rS.derivative('c') as Delayed).force(), empty());
     });
 
     test('different derivatives diff tokens', () {
@@ -160,18 +160,18 @@ void main() {
       //no delay
       expect(s.derivative('c').derivative('a'), t1);
       expect(s.derivative('c').derivative('b'), t2);
-      expect(s.derivative('c').derivative('c'), empty);
+      expect(s.derivative('c').derivative('c'), empty());
       //different delay
       expect((s.delayed('c').derivative('a') as Delayed).force(), t1);
       expect((s.delayed('c').derivative('b') as Delayed).force(), t2);
-      expect((s.delayed('c').derivative('c') as Delayed).force(), empty);
+      expect((s.delayed('c').derivative('c') as Delayed).force(), empty());
 
       //reuse delay
       // ignore: non_constant_identifier_names
       var delayed_c = s.delayed('c');
       expect((delayed_c.derivative('a') as Delayed).force(), t1);
       expect((delayed_c.derivative('b') as Delayed).force(), t2);
-      //expect((delayed_c.derivative('c') as Delayed).force(), empty);
+      //expect((delayed_c.derivative('c') as Delayed).force(), empty());
     });
 
     test('different derivatives diff tokens 3', () {
@@ -183,7 +183,7 @@ void main() {
       var delayed_c = s.delayed('c');
       expect((delayed_c.derivative('a') as Delayed).force(), t1);
       expect((delayed_c.derivative('b') as Delayed).force(), t2);
-      expect((delayed_c.derivative('c') as Delayed).force(), empty);
+      expect((delayed_c.derivative('c') as Delayed).force(), empty());
     });
   });
 }

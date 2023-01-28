@@ -9,7 +9,7 @@ abstract class Language {
     return derivative(it.current).includes(it);
   }
 
-  get isEmpty => this == empty;
+  get isEmpty => this == empty();
 
   Language derivative(Object token);
 
@@ -37,7 +37,7 @@ class Empty extends Terminal {
   factory Empty() => emptyI;
 
   @override
-  Language derivative(Object token) => empty;
+  Language derivative(Object token) => empty();
 
   @override
   bool get isNullable => false;
@@ -59,7 +59,7 @@ class Epsilon extends Terminal {
   factory Epsilon() => epsI;
 
   @override
-  Language derivative(Object token) => empty;
+  Language derivative(Object token) => empty();
 
   @override
   bool get isNullable => true;
@@ -81,7 +81,7 @@ class Token extends Terminal {
   Token(this.token);
   final Object token;
   @override
-  Language derivative(Object token) => this.token == token ? eps() : empty;
+  Language derivative(Object token) => this.token == token ? eps() : empty();
 
   @override
   bool get isNullable => false;
@@ -182,7 +182,7 @@ class Delta extends Composite {
   Delta(this.operand);
   final Language operand;
   @override
-  Language derivative(Object token) => empty;
+  Language derivative(Object token) => empty();
 
   @override
   bool get isNullable => operand.isNullable;

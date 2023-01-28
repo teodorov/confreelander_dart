@@ -86,7 +86,7 @@ void main() {
 
     test('ϵ.delayed(2) .isNullable', () {
       var l = eps().delayed();
-      expect(l.isNullable, false);
+      expect(l.isNullable, true);
     });
 
     test('tok(3).delayed(2) .isNullable', () {
