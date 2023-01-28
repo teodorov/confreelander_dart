@@ -61,7 +61,7 @@ Language
 
 ## Semantics
 
-The semantics is the same as [[1]](#1) with the addition of rule for the Reference operator.
+The semantics is the same as [[1]](#1) with the addition of the rule for the Reference operator.
 
 ```scala
 "D" derivative
