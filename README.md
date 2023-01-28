@@ -44,18 +44,24 @@ from the package authors, and more.
 
 ## Syntax
 
+The syntax is a simplified version of [[1]](#1) with the addition of the Reference operator, which handles recursivity in the context-free expressions.
+
 ```scala
 Language 
    = Terminal
       = "∅" Empty
       | "ϵ" Epsilon
-      | "τ" Token (o: Object)
+      | "τ" Token          (o: Object)
    | Composite
-      = "|" Union (lhs rhs: Language)
-      | "∘" Concatenation (lhs rhs: Language)
-      | "Δ" Delta (operand: Language)
-      | "μ" Reference (operand: Language)
+      = "|" Union          (lhs rhs: Language)
+      | "∘" Concatenation  (lhs rhs: Language)
+      | "Δ" Delta          (operand: Language)
+      | "μ" Reference      (name: Object) (operand: Language)
 ```
+
+## Semantics
+
+The semantics is the same as [[1]](#1) with the addition of rule for the Reference operator.
 
 ```scala
 "D" derivative
@@ -66,7 +72,7 @@ D (τ o)     t = ∅, where o ≠ c
 D (L₁ | L₂) t = (D L₁ t) | (D L₂ t)
 D (L₁ ∘ L₂) t = Δ L₁ (D L₂ t) | (D L₁ t)∘L₂
 D (Δ L)     t = ∅
-D (μ L)     t = μ (D o t)
+D (μ _₁ L)   t = μ _₂ (D o t)
 
 isNullable ∅         = ⊥
 isNullable ϵ         = ⊤
@@ -74,7 +80,7 @@ isNullable (τ o)     = ⊥
 isNullable (L₁ | L₂) = isNullable L₁ ∨ isNullable L₂
 isNullable (L₁ ∘ L₂) = isNullable L₁ ∧ isNullable L₂
 isNullable (Δ L)     = isNullable L
-isNullable (μ L)     = isNullable L
+isNullable (μ _ L)   = isNullable L
 
 isProductive ∅          = ⊥
 isProductive ϵ          = ⊤
@@ -82,7 +88,7 @@ isProductive (τ o)      = ⊥
 isProductive (L₁ | L₂)  = isProductive L₁ ∨ isProductive L₂
 isProductive (L₁ ∘ L₂)  = isProductive L₁ ∧ isProductive L₂
 isProductive (Δ L)      = isProductive L
-isProductive (μ L)      = isProductive L
+isProductive (μ _ L)    = isProductive L
 ```
 
 ## Equivalences
@@ -114,7 +120,7 @@ p**            = p*
 3. Memoization for all composite nodes
    1. let's start by doing it first where it is really needed only.
 
-# Some things to note
+## Some things to note
 
 1. The reference name should not be used in the structural equality
    1. if the name it is used then we need α-conversion equality : ```X = 'a' | X ≡ Y = 'a' | Y```
@@ -148,3 +154,9 @@ Y = (t)=> t ∈ {1, two} | Y
       one: ϵ, 
       +: union, 
       *: concatenation}
+
+
+## References
+
+<a id="1">[1]</a>
+Matthew Might, David Darais, and Daniel Spiewak. "Parsing with derivatives: a functional pearl." Acm sigplan notices 46, no. 9 (2011): 189-195.
