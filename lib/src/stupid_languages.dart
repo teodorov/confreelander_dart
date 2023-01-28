@@ -48,14 +48,6 @@ class Empty extends Terminal {
     map[this] = '${identityHashCode(this)} ∅';
     return '';
   }
-
-  @override
-  int get hashCode => runtimeType.hashCode;
-
-  @override
-  bool operator ==(Object other) {
-    return other is Empty;
-  }
 }
 
 class Epsilon extends Terminal {
@@ -75,14 +67,6 @@ class Epsilon extends Terminal {
     map[this] = '${identityHashCode(this)} ϵ';
     return '';
   }
-
-  @override
-  int get hashCode => runtimeType.hashCode;
-
-  @override
-  bool operator ==(Object other) {
-    return other is Epsilon;
-  }
 }
 
 class Token extends Terminal {
@@ -97,14 +81,6 @@ class Token extends Terminal {
 
   @override
   String toString() => '(Token $token)';
-
-  @override
-  int get hashCode => Object.hash(runtimeType, token);
-
-  @override
-  bool operator ==(Object other) {
-    return super == other || (other is Token && token == other.token);
-  }
 
   @override
   String computeTGF(Map<Language, String> map) {
@@ -131,15 +107,6 @@ class Union extends Composite {
   String toString() => '($lhs | $rhs)';
 
   @override
-  int get hashCode => Object.hash(runtimeType, lhs, rhs);
-
-  @override
-  bool operator ==(Object other) {
-    return super == other ||
-        (other is Union && lhs == other.lhs && rhs == other.rhs);
-  }
-
-  @override
   String computeTGF(Map<Language, String> map) {
     if (map[this] != null) return '';
     map[this] = '${identityHashCode(this)} |';
@@ -161,17 +128,6 @@ class Concatenation extends Composite {
   bool get isProductive => lhs.isProductive && rhs.isProductive;
   @override
   String toString() => '($lhs ∘ $rhs)';
-
-  @override
-  int get hashCode {
-    return Object.hash(runtimeType, lhs, rhs);
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return super == other ||
-        (other is Concatenation && lhs == other.lhs && rhs == other.rhs);
-  }
 
   @override
   String computeTGF(Map<Language, String> map) {
@@ -197,14 +153,6 @@ class Delta extends Composite {
   String toString() => '(δ $operand)';
 
   @override
-  int get hashCode => Object.hash(runtimeType, operand);
-
-  @override
-  bool operator ==(Object other) {
-    return super == other || (other is Delta && operand == other.operand);
-  }
-
-  @override
   String computeTGF(Map<Language, String> map) {
     if (map[this] != null) return '';
     map[this] = '${identityHashCode(this)} δ';
@@ -224,7 +172,6 @@ class Reference extends Composite {
   Reference? _derivative;
   bool? _isNullable;
   bool? _isProductive;
-  int? _hashCode;
 
   ///needs fixed point & memoization
   ///the idea is
@@ -273,30 +220,6 @@ class Reference extends Composite {
 
   @override
   String toString() => '(ref $name)';
-
-  //we cannot get fixedpoint here, because the ints are not a lattice
-  //but a hash based on the name and the target language hash should be good enough
-  @override
-  int get hashCode => _hashCode ??= _computeHashCode();
-  int _computeHashCode() {
-    //the seed value
-    _hashCode = Object.hash(runtimeType, name);
-    //traverse children
-    var hash = target.hashCode;
-    //integrate children hashcode
-    var result = Object.hash(runtimeType, name, hash);
-    //clear the cache
-    _hashCode = null;
-    return result;
-  }
-
-  @override
-  bool operator ==(Object other) {
-    if (super == other) return true;
-    if (other is! Reference) return false;
-    if (name != other.name) return false;
-    return target == other.target;
-  }
 
   @override
   String computeTGF(Map<Language, String> map) {
