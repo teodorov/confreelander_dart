@@ -2,7 +2,6 @@ import 'dart:io';
 
 import "package:characters/characters.dart";
 import 'package:confreelander/src/stupid_constructors.dart';
-// import 'package:confreelander/src/smart_constructors_1.dart';
 import 'package:test/test.dart';
 
 void main() {
