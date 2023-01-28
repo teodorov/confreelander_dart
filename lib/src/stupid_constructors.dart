@@ -4,7 +4,7 @@ Language empty() => Empty();
 Language eps() => Epsilon();
 
 Language token(Object o) => Token(o);
-Reference ref(String name) => Reference(name);
+Reference ref(Object name) => Reference(name);
 
 /// The StupidConstructors extension does not implement the simplification rules
 
@@ -27,7 +27,7 @@ extension SmartConstructors on Language {
     return Delayed(this);
   }
 
-  Language ref(String name) {
+  Language ref(Object name) {
     if (isEmpty) return empty();
     var r = Reference(name);
     r.target = this;

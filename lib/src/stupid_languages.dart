@@ -1,5 +1,7 @@
 import 'dart:collection';
-import 'smart_constructors_1.dart';
+import 'dart:html_common';
+import 'stupid_constructors.dart';
+// import 'smart_constructors_1.dart';
 
 abstract class Language {
   const Language();
@@ -288,7 +290,7 @@ class Delta extends Composite {
 
 class Reference extends Composite {
   Reference(this.name);
-  final String name;
+  final Object name;
   Language target = empty();
   set setTarget(Language target) {
     this.target = target;
@@ -298,6 +300,7 @@ class Reference extends Composite {
   bool? _isNullable;
   bool? _isProductive;
   int? _hashCode;
+  Language? _equalityTarget;
 
   ///needs fixed point & memoization
   ///the idea is suppose false, and see if we can get through by traversing the target
@@ -344,8 +347,10 @@ class Reference extends Composite {
 
   @override
   bool operator ==(Object other) {
-    return super == other ||
-        (other is Reference && name == other.name && target == other.target);
+    if (super == other) return true;
+    if (other is! Reference) return false;
+    if (name != other.name) return false;
+    return target == other.target;
   }
 
   @override
@@ -364,40 +369,21 @@ class Reference extends Composite {
   @override
   void derivate(Object token, Queue<Language> start,
       Queue<Map<Language, Language>> visited) {
-    // if (start.last == this) {
-    //   if (visited.last[this] == null) {
-    //     start.add(this);
-    //     visited.add({this: target.delayed()});
-    //     target.derivate(token, start, visited);
-    //     return;
-    //   }
-    //   var dTarget = visited.last[target]!;
-    //   start.removeLast();
-    //   visited.removeLast();
-    //   visited.last[target] = dTarget;
-    //   return;
-    // }
     if (visited.last[this] != null) {
       return;
     }
 
-    // start.add(this);
-    // visited.addLast({this: target.delayed()});
-    // target.derivate(token, start, visited);
-    // var dTarget = visited.last[target]!;
-    // start.removeLast();
-    // visited.removeLast();
-    // visited.last[this] = dTarget;
-    //-----------
-    visited.last[this] = target.delayed();
+    visited.last[this] = ref(Object());
     target.derivate(token, start, visited);
-    visited.last[this] = visited.last[target]!;
+
+    (visited.last[this]! as Reference).target = visited.last[target]!;
   }
 }
 
+@Deprecated("not needed anymore")
 class Delayed extends Language {
   Delayed(this.operand);
-  final Language operand;
+  Language operand;
 
   bool? _isNullable;
 

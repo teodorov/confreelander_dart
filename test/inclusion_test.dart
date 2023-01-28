@@ -1,7 +1,8 @@
 import 'dart:io';
 
 import "package:characters/characters.dart";
-import 'package:confreelander/src/smart_constructors_1.dart';
+import 'package:confreelander/src/stupid_constructors.dart';
+// import 'package:confreelander/src/smart_constructors_1.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -160,85 +161,6 @@ void main() {
       expect(x.includes(it('aaaa')), true);
     });
 
-    test('regular direct recursive X = a | X', () {
-      var rx = ref('x');
-      var x = token('a') | rx;
-      rx.target = x;
-
-      // print('\n-----X----\n');
-      // File('Lx.tgf').writeAsStringSync(x.toTGF());
-
-      // print('\n-----dX----\n');
-      // rx = ref('x');
-      // x = token('a') | rx;
-      // rx.target = x;
-      // File('Ldx.tgf').writeAsStringSync(x.derivative('a').toTGF());
-
-      // print('\n-----bX----\n');
-      // rx = ref('x');
-      // x = token('a') | rx;
-      // rx.target = x;
-      // File('Lbx.tgf').writeAsStringSync(x.derivative('b').toTGF());
-
-      // print('\n-----dbX----\n');
-      // rx = ref('x');
-      // x = token('a') | rx;
-      // rx.target = x;
-      // File('Ldbx.tgf')
-      //     .writeAsStringSync(x.derivative('a').derivative('b').toTGF());
-
-      // print('\n-----ddX----\n');
-      // rx = ref('x');
-      // x = token('a') | rx;
-      // rx.target = x;
-      // File('Lddx.tgf')
-      //     .writeAsStringSync(x.derivative('a').derivative('a').toTGF());
-
-      // print('\n-----dddX----\n');
-      // rx = ref('x');
-      // x = token('a') | rx;
-      // rx.target = x;
-      // File('Ldddx.tgf').writeAsStringSync(
-      //     x.derivative('a').derivative('a').derivative('a').toTGF());
-
-      // print('\n-----dbdX----\n');
-      // rx = ref('x');
-      // x = token('a') | rx;
-      // rx.target = x;
-      // File('Ldbdx.tgf').writeAsStringSync(
-      //     x.derivative('a').derivative('b').derivative('a').toTGF());
-
-      // print('\n-----ddddX----\n');
-      // rx = ref('x');
-      // x = token('a') | rx;
-      // rx.target = x;
-
-      // File('Lddddx.tgf').writeAsStringSync(x
-      //     .derivative('a')
-      //     .derivative('a')
-      //     .derivative('a')
-      //     .derivative('a')
-      //     .toTGF());
-
-      rx = ref('x');
-      x = token('a') | rx;
-      rx.target = x;
-      expect(x.includes(it('')), false);
-      rx = ref('x');
-      x = token('a') | rx;
-      rx.target = x;
-      expect(x.includes(it('a')), true);
-
-      rx = ref('x');
-      x = token('a') | rx;
-      rx.target = x;
-      expect(x.includes(it('aaa')), true);
-      rx = ref('x');
-      x = token('a') | rx;
-      rx.target = x;
-      expect(x.includes(it('aaaa')), true);
-    });
-
     test('X = a | X, (d X a)', () {
       print('\n-----(d X a)----\n');
       var rx = ref('x');
@@ -276,11 +198,11 @@ void main() {
       rx = ref('x');
       x = token('a') | rx;
       rx.target = x;
-      expect(x.includes(it('aa')), true);
+      expect(x.includes(it('aa')), false);
     });
 
     test('X = a | X, (d (d X b) a)', () {
-      print('\n-----(d (d X a) a)----\n');
+      print('\n-----(d (d X b) a)----\n');
       var rx = ref('x');
       var x = token('a') | rx;
       rx.target = x;
@@ -318,7 +240,7 @@ void main() {
       rx = ref('x');
       x = token('a') | rx;
       rx.target = x;
-      expect(x.includes(it('aaa')), true);
+      expect(x.includes(it('aaa')), false);
     });
 
     test('X = a | X, (d (d (d X b) a) a)', () {
@@ -369,9 +291,9 @@ void main() {
       rx.target = x;
       expect(x.includes(it('')), false);
       expect(x.includes(it('a')), true);
-      expect(x.includes(it('aa')), true);
-      expect(x.includes(it('aaa')), true);
-      expect(x.includes(it('aaaa')), true);
+      expect(x.includes(it('aa')), false);
+      expect(x.includes(it('aaa')), false);
+      expect(x.includes(it('aaaa')), false);
     });
 
     test('regular direct recursive X = X | a', () {
@@ -381,9 +303,9 @@ void main() {
 
       expect(x.includes(it('')), false);
       expect(x.includes(it('a')), true);
-      expect(x.includes(it('aa')), true);
-      expect(x.includes(it('aaa')), true);
-      expect(x.includes(it('aaaa')), true);
+      expect(x.includes(it('aa')), false);
+      expect(x.includes(it('aaa')), false);
+      expect(x.includes(it('aaaa')), false);
     });
 
     test('regular direct recursive X = ϵ | a | X', () {
@@ -393,9 +315,9 @@ void main() {
 
       expect(x.includes(it('')), true);
       expect(x.includes(it('a')), true);
-      expect(x.includes(it('aa')), true);
-      expect(x.includes(it('aaa')), true);
-      expect(x.includes(it('aaaa')), true);
+      expect(x.includes(it('aa')), false);
+      expect(x.includes(it('aaa')), false);
+      expect(x.includes(it('aaaa')), false);
     });
 
     test('regular direct recursive X = b | a | X', () {
@@ -405,25 +327,25 @@ void main() {
 
       expect(x.includes(it('')), false);
       expect(x.includes(it('a')), true);
-      expect(x.includes(it('aa')), true);
-      expect(x.includes(it('aaa')), true);
-      expect(x.includes(it('aaaa')), true);
+      expect(x.includes(it('aa')), false);
+      expect(x.includes(it('aaa')), false);
+      expect(x.includes(it('aaaa')), false);
 
       expect(x.includes(it('b')), true);
-      expect(x.includes(it('bb')), true);
-      expect(x.includes(it('bbb')), true);
-      expect(x.includes(it('bbbb')), true);
+      expect(x.includes(it('bb')), false);
+      expect(x.includes(it('bbb')), false);
+      expect(x.includes(it('bbbb')), false);
 
-      expect(x.includes(it('ab')), true);
-      expect(x.includes(it('ba')), true);
+      expect(x.includes(it('ab')), false);
+      expect(x.includes(it('ba')), false);
 
-      expect(x.includes(it('abb')), true);
-      expect(x.includes(it('bab')), true);
-      expect(x.includes(it('bba')), true);
+      expect(x.includes(it('abb')), false);
+      expect(x.includes(it('bab')), false);
+      expect(x.includes(it('bba')), false);
 
-      expect(x.includes(it('aab')), true);
-      expect(x.includes(it('baa')), true);
-      expect(x.includes(it('aba')), true);
+      expect(x.includes(it('aab')), false);
+      expect(x.includes(it('baa')), false);
+      expect(x.includes(it('aba')), false);
     });
 
     test('word ∘ drow', () {
@@ -541,11 +463,11 @@ void main() {
       rb.target = b;
 
       expect(a.includes(it('')), true);
-      expect(a.includes(it('ab')), true);
-      expect(a.includes(it('abab')), true);
+      expect(a.includes(it('a')), true);
+      expect(a.includes(it('b')), true);
 
-      expect(a.includes(it('ababab')), true);
-      expect(a.includes(it('aba')), true);
+      expect(a.includes(it('ababab')), false);
+      expect(a.includes(it('aba')), false);
     });
 
     test('E = e | S. S = s | E, (d E e)', () {
@@ -580,7 +502,7 @@ void main() {
       s = token('s') | rE;
       rE.target = e;
       rS.target = s;
-      expect(e.includes(it('es')), true);
+      expect(e.includes(it('es')), false);
     });
 
     test('E = e | S. S = s | E, (d (d E e) e)', () {
@@ -595,7 +517,7 @@ void main() {
       File('ddEee.tgf')
           .writeAsStringSync(e.derivative('e').derivative('e').toTGF());
 
-      expect(e.includes(it('ee')), true);
+      expect(e.includes(it('ee')), false);
     });
 
     test('mutually direct recursive', () {
@@ -607,22 +529,22 @@ void main() {
       rS.target = s;
 
       expect(e.includes(it('e')), true);
-      expect(e.includes(it('ee')), true);
-      expect(e.includes(it('eee')), true);
+      expect(e.includes(it('ee')), false);
+      expect(e.includes(it('eee')), false);
 
       expect(e.includes(it('s')), true);
-      expect(e.includes(it('ss')), true);
-      expect(e.includes(it('sss')), true);
+      expect(e.includes(it('ss')), false);
+      expect(e.includes(it('sss')), false);
 
-      expect(e.includes(it('es')), true);
-      expect(e.includes(it('se')), true);
-      expect(e.includes(it('ees')), true);
-      expect(e.includes(it('ese')), true);
-      expect(e.includes(it('see')), true);
+      expect(e.includes(it('es')), false);
+      expect(e.includes(it('se')), false);
+      expect(e.includes(it('ees')), false);
+      expect(e.includes(it('ese')), false);
+      expect(e.includes(it('see')), false);
 
-      expect(e.includes(it('sse')), true);
-      expect(e.includes(it('ses')), true);
-      expect(e.includes(it('ess')), true);
+      expect(e.includes(it('sse')), false);
+      expect(e.includes(it('ses')), false);
+      expect(e.includes(it('ess')), false);
     });
   });
 }
