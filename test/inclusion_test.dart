@@ -1,7 +1,9 @@
 import 'dart:io';
 
 import "package:characters/characters.dart";
+import 'package:collection/collection.dart';
 import 'package:confreelander/src/stupid_constructors.dart';
+import 'package:confreelander/src/derivative_iterable.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -26,18 +28,9 @@ void main() {
       var x = rx.seq(token('a'));
       rx.target = x;
 
-      File('dXa.tgf').writeAsStringSync(x.toTGF());
-      File('dXaa.tgf').writeAsStringSync(x.derivative('a').toTGF());
-      File('dXaaa.tgf')
-          .writeAsStringSync(x.derivative('a').derivative('a').toTGF());
-      File('dXaaaa.tgf').writeAsStringSync(
-          x.derivative('a').derivative('a').derivative('a').toTGF());
-      File('dXaaaaa.tgf').writeAsStringSync(x
-          .derivative('a')
-          .derivative('a')
-          .derivative('a')
-          .derivative('a')
-          .toTGF());
+      x.derivatives('aaaaa'.characters).forEachIndexed((index, dpT) {
+        File('dX$index.tgf').writeAsStringSync(dpT.toTGF());
+      });
 
       expect(rx.includes(it('')), false);
       expect(rx.includes(it('a')), false);
