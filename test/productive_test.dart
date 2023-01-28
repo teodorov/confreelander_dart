@@ -71,31 +71,6 @@ void main() {
       expect(l.isProductive, true);
     });
 
-    test('∅.delayed(2) .isProductive', () {
-      var l = empty().delayed();
-      expect(l.isProductive, false);
-    });
-
-    test('ϵ.delayed(2) .isProductive', () {
-      var l = eps().delayed();
-      expect(l.isProductive, false);
-    });
-
-    test('tok(3).delayed(2) .isProductive', () {
-      var l = token(3).delayed();
-      expect(l.isProductive, false);
-    });
-
-    test('tok(3).delayed(3) .isProductive', () {
-      var l = token(3).delayed();
-      expect(l.isProductive, true);
-    });
-
-    test('tok(3).delayed(3).delayed(3) .isProductive', () {
-      var l = token(3).delayed().delayed();
-      expect(l.isProductive, false);
-    });
-
     test('S = tok(a) | S .isProductive', () {
       var rS = ref('S');
       var l = token('a') | rS;

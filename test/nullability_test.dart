@@ -1,4 +1,3 @@
-import 'package:confreelander/confreelander.dart';
 import 'package:confreelander/src/stupid_constructors.dart';
 import 'package:test/test.dart';
 
@@ -77,26 +76,6 @@ void main() {
     test('delta token(2) .isNullable', () {
       var l = token(2).delta;
       expect(l.isNullable, false);
-    });
-
-    test('∅.delayed(2) .isNullable', () {
-      var l = empty().delayed();
-      expect(l.isNullable, false);
-    });
-
-    test('ϵ.delayed(2) .isNullable', () {
-      var l = eps().delayed();
-      expect(l.isNullable, true);
-    });
-
-    test('tok(3).delayed(2) .isNullable', () {
-      var l = token(3).delayed();
-      expect(l.isNullable, false);
-    });
-
-    test('tok(3).delayed(3) .isNullable', () {
-      var l = (token(3).delayed() as Delayed).force(3);
-      expect(l.isNullable, true);
     });
 
     test('S = tok(a) | S .isNullable', () {

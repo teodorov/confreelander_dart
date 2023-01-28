@@ -23,10 +23,6 @@ extension SmartConstructors on Language {
 
   Language get delta => Delta(this);
 
-  Language delayed() {
-    return Delayed(this);
-  }
-
   Language ref(Object name) {
     if (isEmpty) return empty();
     var r = Reference(name);
