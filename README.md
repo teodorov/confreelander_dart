@@ -70,3 +70,19 @@ p** ⟹ p*
    1. Here I use explicit reference nodes, which reify the back-edges
 3. Memoization for all composite nodes
    1. let's start by doing it first where it is really needed only.
+
+# Some things to note
+
+1. The reference name should not be used in the structural equality
+   1. if the name it is used then we need α-conversion equality : ```X = 'a' | X ≡ Y = 'a' | Y```
+2. if we want predicate tokens we might need structural equality on closures
+
+```bnf
+two = P(2)
+X = (t)=> t ∈ {1, two} | X
+
+≡
+
+two = P(2)
+Y = (t)=> t ∈ {1, two} | Y
+```
