@@ -156,6 +156,10 @@ Y = (t)=> t ∈ {1, two} | Y
       *: concatenation}
 
 
+## Some numbers
+
+- 2023/01/29 - v1.0.0: NestedQuantifiers(RunTime): 0.09164101415936503 us.
+
 ## References
 
 <a id="1">[1]</a>
