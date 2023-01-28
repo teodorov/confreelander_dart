@@ -65,30 +65,30 @@ The semantics is the same as [[1]](#1) with the addition of the rule for the Ref
 
 ```scala
 "D" derivative
-D ∅         t = ∅
-D ϵ         t = ∅
-D (τ o)     o = ϵ
-D (τ o)     t = ∅, where o ≠ c
-D (L₁ | L₂) t = (D L₁ t) | (D L₂ t)
-D (L₁ ∘ L₂) t = (Δ L₁) ∘ (D L₂ t) | (D L₁ t) ∘ L₂
-D (Δ L)     t = ∅
-D (μ _₁ L)  t = μ _₂ (D o t)
+D ∅         t ≜ ∅
+D ϵ         t ≜ ∅
+D (τ o)     o ≜ ϵ
+D (τ o)     t ≜ ∅, where o ≠ c
+D (L₁ | L₂) t ≜ (D L₁ t) | (D L₂ t)
+D (L₁ ∘ L₂) t ≜ (Δ L₁) ∘ (D L₂ t) | (D L₁ t) ∘ L₂
+D (Δ L)     t ≜ ∅
+D (μ _₁ L)  t ≜ μ _₂ (D o t)
 
-isNullable ∅         = ⊥
-isNullable ϵ         = ⊤
-isNullable (τ o)     = ⊥
-isNullable (L₁ | L₂) = isNullable L₁ ∨ isNullable L₂
-isNullable (L₁ ∘ L₂) = isNullable L₁ ∧ isNullable L₂
-isNullable (Δ L)     = isNullable L
-isNullable (μ _ L)   = isNullable L
+isNullable ∅         ≜ ⊥
+isNullable ϵ         ≜ ⊤
+isNullable (τ o)     ≜ ⊥
+isNullable (L₁ | L₂) ≜ isNullable L₁ ∨ isNullable L₂
+isNullable (L₁ ∘ L₂) ≜ isNullable L₁ ∧ isNullable L₂
+isNullable (Δ L)     ≜ isNullable L
+isNullable (μ _ L)   ≜ isNullable L
 
-isProductive ∅          = ⊥
-isProductive ϵ          = ⊤
-isProductive (τ o)      = ⊥
-isProductive (L₁ | L₂)  = isProductive L₁ ∨ isProductive L₂
-isProductive (L₁ ∘ L₂)  = isProductive L₁ ∧ isProductive L₂
-isProductive (Δ L)      = isProductive L
-isProductive (μ _ L)    = isProductive L
+isProductive ∅          ≜ ⊥
+isProductive ϵ          ≜ ⊤
+isProductive (τ o)      ≜ ⊥
+isProductive (L₁ | L₂)  ≜ isProductive L₁ ∨ isProductive L₂
+isProductive (L₁ ∘ L₂)  ≜ isProductive L₁ ∧ isProductive L₂
+isProductive (Δ L)      ≜ isProductive L
+isProductive (μ _ L)    ≜ isProductive L
 ```
 
 ## Equivalences
@@ -96,7 +96,7 @@ isProductive (μ _ L)    = isProductive L
 ```scala
 ∅ | p          = p
 p | ∅          = p
-ϵₛ | ϵₜ        = ϵ_{s ∪ t}
+ϵₛ | ϵₜ         = ϵ_{s ∪ t}
 
 ∅ ∘ p          = ∅
 p ∘ ∅          = ∅
