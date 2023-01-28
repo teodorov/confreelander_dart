@@ -42,25 +42,68 @@ TODO: Tell users more about the package: where to find more information, how to
 contribute to the package, how to file issues, what response they can expect
 from the package authors, and more.
 
+## Syntax
+
+```scala
+Language 
+   = Terminal
+      = "∅" Empty
+      | "ϵ" Epsilon
+      | "τ" Token (o: Object)
+   | Composite
+      = "|" Union (lhs rhs: Language)
+      | "∘" Concatenation (lhs rhs: Language)
+      | "Δ" Delta (operand: Language)
+      | "μ" Reference (operand: Language)
+```
+
+```scala
+"D" derivative
+D ∅         t = ∅
+D ϵ         t = ∅
+D (τ o)     o = ϵ
+D (τ o)     t = ∅, where o ≠ c
+D (L₁ | L₂) t = (D L₁ t) | (D L₂ t)
+D (L₁ ∘ L₂) t = Δ L₁ (D L₂ t) | (D L₁ t)∘L₂
+D (Δ L)     t = ∅
+D (μ L)     t = μ (D o t)
+
+isNullable ∅         = ⊥
+isNullable ϵ         = ⊤
+isNullable (τ o)     = ⊥
+isNullable (L₁ | L₂) = isNullable L₁ ∨ isNullable L₂
+isNullable (L₁ ∘ L₂) = isNullable L₁ ∧ isNullable L₂
+isNullable (Δ L)     = isNullable L
+isNullable (μ L)     = isNullable L
+
+isProductive ∅          = ⊥
+isProductive ϵ          = ⊤
+isProductive (τ o)      = ⊥
+isProductive (L₁ | L₂)  = isProductive L₁ ∨ isProductive L₂
+isProductive (L₁ ∘ L₂)  = isProductive L₁ ∧ isProductive L₂
+isProductive (Δ L)      = isProductive L
+isProductive (μ L)      = isProductive L
+```
+
 ## Equivalences
 
-```lean
-∅ | p ⟹ p
-p | ∅ ⟹ p
-ϵₛ | ϵₜ ⟹ ϵ_{s ∪ t}
+```scala
+∅ | p          = p
+p | ∅          = p
+ϵₛ | ϵₜ        = ϵ_{s ∪ t}
 
-∅ ∘ p ⟹ ∅
-p ∘ ∅ ⟹ ∅
-ϵₛ ∘ p ⟹ p >> λu.(s, u)
-p ∘ ϵₛ ⟹ p >> λu.(u, s)
+∅ ∘ p          = ∅
+p ∘ ∅          = ∅
+ϵₛ ∘ p         = p >> λu.(s, u)
+p ∘ ϵₛ         = p >> λu.(u, s)
 
-∅* ⟹ ϵ_{∅}
-p** ⟹ p*
+∅*             = ϵ_{∅}
+p**            = p*
 
-∅ >> f ⟹ ∅
-ϵₛ >> f ⟹ ϵ_{s.map(λu.f(u))}
-(ϵₛ ∘ p) >> f ⟹ p >> λu. f( (s, u) )
-(p >> f) >> g ⟹ p >> (g ◯ f)
+∅ >> f         = ∅
+ϵₛ >> f        = ϵ_{s.map(λu.f(u))}
+(ϵₛ ∘ p) >> f  = p >> λu. f( (s, u) )
+(p >> f) >> g  = p >> (g ◯ f)
 ```
 
 ## Things that I don't like on the original article
@@ -86,3 +129,22 @@ X = (t)=> t ∈ {1, two} | X
 two = P(2)
 Y = (t)=> t ∈ {1, two} | Y
 ```
+
+3. Recursive vs iterative
+   1. The recursive implementation
+      1. does not need equality (and hash)
+      2. relies on the implementation language stack
+   2. An iterative implementation
+      1. if it uses a hash-table to mark the visited nodes
+         1. needs equality
+      2. if it marks the nodes directly
+         1. the nodes need to have the needed fields - (like an algorithm specific extension field)
+         2. does not need equality
+         3. In C -- if the algorithm specific marking is a small set (like 3-4 color) we could use pointer tagging.
+         4. the marking can be implemented using Proxy objects.
+4. CFE are a semiring 
+   {
+      zero: ∅, 
+      one: ϵ, 
+      +: union, 
+      *: concatenation}
