@@ -1,6 +1,9 @@
 import 'dart:io';
 
+import 'package:confreelander/src/language_to_tgf.dart';
+import 'package:confreelander/src/nullability.dart';
 import 'package:confreelander/src/stupid_constructors.dart';
+import 'package:confreelander/src/derivative.dart';
 import 'package:test/test.dart';
 
 void main() {
