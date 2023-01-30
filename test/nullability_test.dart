@@ -149,6 +149,79 @@ void main() {
       expect(rsd.isNullable, false);
     });
 
-    test('', () {});
+    /// Given by ChatGPT
+    ///S -> A B
+    ///A -> C | epsilon
+    ///B -> C | epsilon
+    ///C -> S
+    test('sabc', () {
+      var rS = ref('S');
+      var rA = ref('A');
+      var rB = ref('B');
+      var rC = ref('C');
+      var s = rA.seq(rB);
+      var a = rC | eps();
+      var b = rC | eps();
+      var c = rS;
+      rS.target = s;
+      rA.target = a;
+      rB.target = b;
+      rC.target = c;
+
+      expect(s.isNullable, true);
+      expect(c.isNullable, true);
+    });
+
+    /// Given by ChatGPT
+    ///S -> A B
+    ///A -> a | epsilon
+    ///B -> b | epsilon
+    test('sab', () {
+      var rS = ref('S');
+      var rA = ref('A');
+      var rB = ref('B');
+
+      var s = rA.seq(rB);
+      var a = token('a') | eps();
+      var b = token('b') | eps();
+
+      rS.target = s;
+      rA.target = a;
+      rB.target = b;
+
+      expect(s.isNullable, true);
+      expect(a.isNullable, true);
+      expect(b.isNullable, true);
+    });
+
+    /// Given by ChatGPT
+    ///S -> A B
+    ///A -> C | epsilon
+    ///B -> D | epsilon
+    ///C -> a A D
+    ///D -> b B C
+    test('sab', () {
+      var rS = ref('S');
+      var rA = ref('A');
+      var rB = ref('B');
+      var rC = ref('C');
+      var rD = ref('D');
+      var s = rA.seq(rB);
+      var a = rC | eps();
+      var b = rD | eps();
+      var c = token('a').seq(rA).seq(rD);
+      var d = token('b').seq(rB).seq(rC);
+      rS.target = s;
+      rA.target = a;
+      rB.target = b;
+      rC.target = c;
+      rD.target = d;
+
+      expect(s.isNullable, true);
+      expect(a.isNullable, true);
+      expect(b.isNullable, true);
+      expect(c.isNullable, true);
+      expect(d.isNullable, true);
+    });
   });
 }
