@@ -221,7 +221,9 @@ void main() {
       File('ac.tgf').writeAsStringSync(c.toTGF());
 
       expect(a.isNullable, true);
+      expect(rA.isNullable, true);
       expect(c.isNullable, true);
+      expect(rC.isNullable, true);
     });
 
     test('sac left', () {
@@ -229,15 +231,17 @@ void main() {
       var rA = ref('A');
       var rC = ref('C');
       var a = rC | eps();
-      var c = rS;
+      var c = rA;
       rS.target = rA;
       rA.target = a;
       rC.target = c;
 
       File('sac.tgf').writeAsStringSync(c.toTGF());
 
+      expect(rS.isNullable, true);
       expect(a.isNullable, true);
       expect(c.isNullable, true);
+      expect(rC.isNullable, true);
     });
 
     /// Given by ChatGPT
