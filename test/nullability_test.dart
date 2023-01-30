@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:confreelander/src/stupid_constructors.dart';
 import 'package:test/test.dart';
 
@@ -154,7 +156,7 @@ void main() {
     ///A -> C | epsilon
     ///B -> C | epsilon
     ///C -> S
-    test('sabc', () {
+    test('sabc left', () {
       var rS = ref('S');
       var rA = ref('A');
       var rB = ref('B');
@@ -168,7 +170,73 @@ void main() {
       rB.target = b;
       rC.target = c;
 
+      File('sabc.tgf').writeAsStringSync(c.toTGF());
+
       expect(s.isNullable, true);
+      expect(c.isNullable, true);
+    });
+
+    test('sabc right', () {
+      var rS = ref('S');
+      var rA = ref('A');
+      var rB = ref('B');
+      var rC = ref('C');
+      var s = rA.seq(rB);
+      var a = eps() | rC;
+      var b = eps() | rC;
+      var c = rS;
+      rS.target = s;
+      rA.target = a;
+      rB.target = b;
+      rC.target = c;
+
+      File('sabc.tgf').writeAsStringSync(c.toTGF());
+
+      expect(s.isNullable, true);
+      expect(c.isNullable, true);
+    });
+
+    test('ac left', () {
+      var rA = ref('A');
+      var rC = ref('C');
+      var a = rC | eps();
+      var c = rA;
+      rA.target = a;
+      rC.target = c;
+
+      File('ac.tgf').writeAsStringSync(c.toTGF());
+
+      expect(a.isNullable, true);
+      expect(c.isNullable, true);
+    });
+
+    test('ac right', () {
+      var rA = ref('A');
+      var rC = ref('C');
+      var a = eps() | rC;
+      var c = rA;
+      rA.target = a;
+      rC.target = c;
+
+      File('ac.tgf').writeAsStringSync(c.toTGF());
+
+      expect(a.isNullable, true);
+      expect(c.isNullable, true);
+    });
+
+    test('sac left', () {
+      var rS = ref('S');
+      var rA = ref('A');
+      var rC = ref('C');
+      var a = rC | eps();
+      var c = rS;
+      rS.target = rA;
+      rA.target = a;
+      rC.target = c;
+
+      File('sac.tgf').writeAsStringSync(c.toTGF());
+
+      expect(a.isNullable, true);
       expect(c.isNullable, true);
     });
 

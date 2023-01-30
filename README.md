@@ -80,7 +80,7 @@ isNullable (τ o)     ≜ ⊥
 isNullable (L₁ | L₂) ≜ isNullable L₁ ∨ isNullable L₂
 isNullable (L₁ ∘ L₂) ≜ isNullable L₁ ∧ isNullable L₂
 isNullable (Δ L)     ≜ isNullable L
-isNullable (μ _ L)   ≜ isNullable L
+isNullable (μ _ L)   ≜ fix (isNullable L)
 
 isProductive ∅          ≜ ⊥
 isProductive ϵ          ≜ ⊤
@@ -88,7 +88,7 @@ isProductive (τ o)      ≜ ⊥
 isProductive (L₁ | L₂)  ≜ isProductive L₁ ∨ isProductive L₂
 isProductive (L₁ ∘ L₂)  ≜ isProductive L₁ ∧ isProductive L₂
 isProductive (Δ L)      ≜ isProductive L
-isProductive (μ _ L)    ≜ isProductive L
+isProductive (μ _ L)    ≜ fix (isProductive L)
 ```
 
 ## Equivalences

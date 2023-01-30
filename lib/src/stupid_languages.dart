@@ -121,7 +121,7 @@ class Concatenation extends Composite {
   final Language lhs, rhs;
   @override
   Language derivative(Object token) =>
-      lhs.delta.seq(rhs.derivative(token)) | lhs.derivative(token).seq(rhs);
+      lhs.derivative(token).seq(rhs) | lhs.delta.seq(rhs.derivative(token));
   @override
   bool get isNullable => lhs.isNullable && rhs.isNullable;
   @override
