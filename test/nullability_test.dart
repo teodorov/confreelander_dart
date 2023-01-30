@@ -236,7 +236,7 @@ void main() {
       rA.target = a;
       rC.target = c;
 
-      File('sac.tgf').writeAsStringSync(c.toTGF());
+      File('sac.tgf').writeAsStringSync(rS.toTGF());
 
       expect(rS.isNullable, true);
       expect(a.isNullable, true);
@@ -292,8 +292,8 @@ void main() {
       expect(s.isNullable, true);
       expect(a.isNullable, true);
       expect(b.isNullable, true);
-      expect(c.isNullable, true);
-      expect(d.isNullable, true);
+      expect(c.isNullable, false);
+      expect(d.isNullable, false);
     });
   });
 }

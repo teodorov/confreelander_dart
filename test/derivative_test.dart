@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 void main() {
   group('derivative', () {
     test('D empty', () {
-      expect(identical(empty, empty().derivative(23)), true);
+      expect(identical(empty(), empty().derivative(23)), true);
     });
 
     test('D epsilon', () {

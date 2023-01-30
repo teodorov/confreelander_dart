@@ -77,7 +77,7 @@ void main() {
       expect(x.includes(it('a')), true);
     });
 
-    test('regular left recursive \'aa\' ∈ X = ϵ | Xa', () {
+    test('regular left recursive aa ∈ X = ϵ | Xa', () {
       var rx = ref('x');
       var x = eps() | rx.seq(token('a'));
       rx.target = x;

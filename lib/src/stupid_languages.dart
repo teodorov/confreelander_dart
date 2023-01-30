@@ -91,16 +91,78 @@ class Token extends Terminal {
 }
 
 /// A composite parser encapsulates at least another parser
-abstract class Composite extends Language {}
+abstract class Composite extends Language {
+  //begin for isNullable
+  bool? transientNullability;
+  bool? fixedNullability;
+  List<Language> parents = [];
+  static Queue<Language> workset = ListQueue();
+  //end for isNullable
+
+  @override
+  bool get isNullable {
+    if (fixedNullability != null) {
+      return fixedNullability!;
+    }
+    //node_for
+    ensureTransient(this);
+    //workset.repeat solve
+    while (workset.isNotEmpty) {
+      var current = workset.removeFirst();
+      solveNullability(current);
+    }
+    fixedNullability = transientNullability!;
+    return fixedNullability!;
+  }
+
+  Composite ensureTransient(Composite node) {
+    if (node.transientNullability != null) {
+      return node;
+    }
+    node.transientNullability = false;
+    workset.add(node);
+    return node;
+  }
+
+  void solveNullability(Language current) {
+    if (current is Terminal) return;
+    Composite composite = current as Composite;
+    if (composite.fixedNullability != null) return;
+    bool nullableF(Language l) {
+      if (l is Terminal) {
+        return l.isNullable;
+      }
+      Composite node = l as Composite;
+      if (node.fixedNullability != null) return node.fixedNullability!;
+      node.parents.add(current);
+      return ensureTransient(node).transientNullability!;
+    }
+
+    var newNullability = current.fixableIsNullable(nullableF);
+    if (current.transientNullability != newNullability) {
+      current.transientNullability = newNullability;
+      //signal the parents because the current language nullability changed
+      for (var element in current.parents) {
+        workset.add(element);
+      }
+    }
+  }
+
+  fixableIsNullable(bool Function(Language l) isNullableF);
+}
 
 class Union extends Composite {
   Union(this.lhs, this.rhs);
   final Language lhs, rhs;
+
   @override
   Language derivative(Object token) =>
       lhs.derivative(token) | rhs.derivative(token);
   @override
-  bool get isNullable => lhs.isNullable || rhs.isNullable;
+  bool fixableIsNullable(bool Function(Language l) isNullableF) {
+    return isNullableF(lhs) || isNullableF(rhs);
+  }
+
   @override
   bool get isProductive => lhs.isProductive || rhs.isProductive;
   @override
@@ -112,7 +174,7 @@ class Union extends Composite {
     map[this] = '${identityHashCode(this)} |';
     var lhsL = lhs.computeTGF(map);
     var rhsL = rhs.computeTGF(map);
-    return '$lhsL\n$rhsL\n${identityHashCode(this)} ${identityHashCode(lhs)}\n${identityHashCode(this)} ${identityHashCode(rhs)}\n';
+    return '$lhsL\n$rhsL\n${identityHashCode(this)} ${identityHashCode(lhs)} l\n${identityHashCode(this)} ${identityHashCode(rhs)} r\n';
   }
 }
 
@@ -123,7 +185,10 @@ class Concatenation extends Composite {
   Language derivative(Object token) =>
       lhs.derivative(token).seq(rhs) | lhs.delta.seq(rhs.derivative(token));
   @override
-  bool get isNullable => lhs.isNullable && rhs.isNullable;
+  bool fixableIsNullable(bool Function(Language l) isNullableF) {
+    return isNullableF(lhs) && isNullableF(rhs);
+  }
+
   @override
   bool get isProductive => lhs.isProductive && rhs.isProductive;
   @override
@@ -135,7 +200,7 @@ class Concatenation extends Composite {
     map[this] = '${identityHashCode(this)} ∘';
     var lhsL = lhs.computeTGF(map);
     var rhsL = rhs.computeTGF(map);
-    return '$lhsL\n$rhsL\n${identityHashCode(this)} ${identityHashCode(lhs)}\n${identityHashCode(this)} ${identityHashCode(rhs)}\n';
+    return '$lhsL\n$rhsL\n${identityHashCode(this)} ${identityHashCode(lhs)} l\n${identityHashCode(this)} ${identityHashCode(rhs)} r\n';
   }
 }
 
@@ -145,7 +210,10 @@ class Delta extends Composite {
   @override
   Language derivative(Object token) => empty();
   @override
-  bool get isNullable => operand.isNullable;
+  bool fixableIsNullable(bool Function(Language l) isNullableF) {
+    return isNullableF(operand);
+  }
+
   @override
   bool get isProductive => operand.isProductive;
 
@@ -164,16 +232,16 @@ class Delta extends Composite {
 class Reference extends Composite {
   Reference(this.name);
   final Object name;
-  Language target = empty();
-  set setTarget(Language target) {
-    this.target = target;
+  Language _target = empty();
+
+  set target(Language target) {
+    _target = target;
   }
 
   Reference? _derivative;
-  bool? _isNullable;
   bool? _isProductive;
 
-  ///needs fixed point & memoization
+  ///needs memoization
   ///the idea is
   ///   1. create an empty reference,
   ///   2. compute derivative of the target, obtaining the reference if recurse to this
@@ -187,24 +255,16 @@ class Reference extends Composite {
     //the the derivative to a reference
     _derivative = ref(Object());
     //recurse into the operand, and get its derivative
-    _derivative!.target = target.derivative(token);
+    _derivative!._target = _target.derivative(token);
     var der = _derivative!;
     //reset the derivative for the next time
     _derivative = null;
     return der;
   }
 
-  ///needs fixed point & memoization
-  ///the idea is suppose false, and see if we can get through by traversing the target
   @override
-  bool get isNullable => _isNullable ??= _computeIsNullable();
-  bool _computeIsNullable() {
-    //suppose false, before traversing children
-    _isNullable = false;
-    var result = target.isNullable;
-    //clear the cache
-    _isNullable = null;
-    return result;
+  bool fixableIsNullable(bool Function(Language l) isNullableF) {
+    return isNullableF(_target);
   }
 
   @override
@@ -212,7 +272,7 @@ class Reference extends Composite {
   bool _computeIsProductive() {
     //suppose false, before traversing children
     _isProductive = false;
-    var result = target.isProductive;
+    var result = _target.isProductive;
     //clear the cache
     _isProductive = null;
     return result;
@@ -225,7 +285,7 @@ class Reference extends Composite {
   String computeTGF(Map<Language, String> map) {
     if (map[this] != null) return '';
     map[this] = '${identityHashCode(this)} R($name)';
-    var targetL = target.computeTGF(map);
-    return '$targetL\n${identityHashCode(this)} ${identityHashCode(target)}\n';
+    var targetL = _target.computeTGF(map);
+    return '$targetL\n${identityHashCode(this)} ${identityHashCode(_target)}\n';
   }
 }
