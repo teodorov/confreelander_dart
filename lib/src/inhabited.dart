@@ -1,5 +1,7 @@
 // ignore_for_file: avoid_renaming_method_parameters
 
+import 'package:confreelander/src/nullability.dart';
+
 import 'fixer.dart';
 import 'languages.dart';
 
@@ -28,7 +30,7 @@ class IsInhabited extends FunctionalVisitor<bool Function(Language), bool> {
       isInhabitedF(node.lhs) && isInhabitedF(node.rhs);
   @override
   bool visitDelta(Delta node, bool Function(Language) isInhabitedF) =>
-      isInhabitedF(node.operand);
+      node.operand.isNullable;
 
   @override
   bool visitReference(Reference node, bool Function(Language) isInhabitedF) =>
@@ -37,6 +39,7 @@ class IsInhabited extends FunctionalVisitor<bool Function(Language), bool> {
 
 class MaybeInhabited extends IsInhabited {
   @override
-  bool visitReference(Reference node, bool Function(Language p1) isInhabitedF) =>
+  bool visitReference(
+          Reference node, bool Function(Language p1) isInhabitedF) =>
       node.target.isEmpty ? true : isInhabitedF(node.target);
 }

@@ -303,6 +303,20 @@ void main() {
       expect(x.includes(it('aaaa')), false);
     });
 
+    test('left recursive X = Xa | ϵ', () {
+      var rx = ref('x');
+      var x = rx.seq(token('a')) | eps();
+      rx.target = x;
+
+      File('xae.tgf').writeAsStringSync(x.toTGF());
+
+      expect(x.includes(it('')), true);
+      expect(x.includes(it('a')), true);
+      expect(x.includes(it('aa')), true);
+      expect(x.includes(it('aaa')), true);
+      expect(x.includes(it('aaaa')), true);
+    });
+
     test('regular direct recursive X = ϵ | a | X', () {
       var rx = ref('x');
       var x = eps() | token('a') | rx;

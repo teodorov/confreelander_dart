@@ -70,7 +70,7 @@ void main() {
 
     test('delta token(2) .isProductive', () {
       var l = token(2).delta;
-      expect(l.isProductive, true);
+      expect(l.isProductive, false);
     });
 
     test('S = tok(a) | S .isProductive', () {

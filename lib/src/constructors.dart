@@ -1,3 +1,5 @@
+import 'package:confreelander/src/nullability.dart';
+
 import 'languages.dart';
 
 Language empty() => Empty();
@@ -32,7 +34,10 @@ extension SmartConstructors on Language {
     return concatenation(other);
   }
 
-  Language get delta => this is Delta ? this : Delta(this);
+  Language get delta {
+    return isNullable ? eps() : empty();
+    // return this is Delta ? this : Delta(this);
+  }
 
   Language ref(Object name) {
     if (isEmpty) return empty();
