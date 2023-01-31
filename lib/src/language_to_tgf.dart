@@ -33,7 +33,7 @@ class LanguageToTGF extends FunctionalVisitor<Map<Language, String>, String> {
   @override
   String visitToken(Token node, Map<Language, String> input) {
     if (input[node] != null) return '';
-    input[node] = '${identityHashCode(node)} (τ $node.token)';
+    input[node] = '${identityHashCode(node)} (τ ${node.token})';
     return '';
   }
 
@@ -66,7 +66,7 @@ class LanguageToTGF extends FunctionalVisitor<Map<Language, String>, String> {
   @override
   String visitReference(Reference node, Map<Language, String> input) {
     if (input[node] != null) return '';
-    input[node] = '${identityHashCode(node)} μ';
+    input[node] = '${identityHashCode(node)} (μ ${node.name})';
     var opL = computeTGF(node.target, input);
     return '$opL\n${identityHashCode(node)} ${identityHashCode(node.target)}\n';
   }
