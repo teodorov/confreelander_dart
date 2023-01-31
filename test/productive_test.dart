@@ -1,3 +1,7 @@
+import 'dart:io';
+
+import 'package:confreelander/src/inhabited.dart';
+import 'package:confreelander/src/language_to_tgf.dart';
 import 'package:confreelander/src/stupid_constructors.dart';
 import 'package:confreelander/src/derivative.dart';
 import 'package:test/test.dart';
@@ -96,9 +100,10 @@ void main() {
       expect(rS.isProductive, true);
       expect(l.isProductive, true);
       expect(l.derivative('a').isProductive, true);
-      expect(l.derivative('a').derivative('a').isProductive, true);
+
+      expect(l.derivative('a').derivative('a').isProductive, false);
       expect(
-          l.derivative('a').derivative('a').derivative('a').isProductive, true);
+          l.derivative('a').derivative('a').derivative('a').isProductive, false);
       expect(l.derivative('a').derivative('a').derivative('b').isProductive,
           false);
     });

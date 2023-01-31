@@ -1,16 +1,17 @@
 import 'dart:collection';
 
-import 'nullability.dart';
 import 'stupid_languages.dart';
 
 class Fixer {
+  Fixer(this.visitor);
+  FunctionalVisitor<bool Function(Language), bool> visitor;
   Map<Language, bool?> fixed = HashMap.identity();
   Map<Language, bool?> transient = HashMap.identity();
   Map<Language, List<Language>> parents = HashMap.identity();
   Map<Language, List<Language>> children = HashMap.identity();
   Queue<Language> workset = ListQueue();
 
-  bool isNullable(Language node) {
+  bool call(Language node) {
     var property = fixed[node];
     if (property != null) return property;
     ensureTransient(node);
@@ -46,7 +47,7 @@ class Fixer {
       return transient[node]!;
     }
 
-    var newProperty = current.accept(LanguageIsNullable(), isNullableF);
+    var newProperty = current.accept(visitor, isNullableF);
     children[current] = currentChildren;
     for (var child in currentChildren) {
       parents.putIfAbsent(child, () => []).add(current);

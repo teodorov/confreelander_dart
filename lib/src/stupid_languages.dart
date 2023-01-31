@@ -32,8 +32,6 @@ abstract class Language {
   }
 
   get isEmpty => this == empty();
-
-  bool get isProductive => false;
 }
 
 /// a Terminal parser does not contain sub-parsers
@@ -62,9 +60,6 @@ class Epsilon extends Terminal {
   }
 
   @override
-  bool get isProductive => true;
-
-  @override
   String toString() => 'ε';
 }
 
@@ -75,9 +70,6 @@ class Token extends Terminal {
   O accept<I, O>(FunctionalVisitor<I, O> visitor, input) {
     return visitor.visitToken(this, input);
   }
-
-  @override
-  bool get isProductive => true;
 
   @override
   String toString() => '(Token $token)';
@@ -101,8 +93,6 @@ class Union extends Composite {
   }
 
   @override
-  bool get isProductive => lhs.isProductive || rhs.isProductive;
-  @override
   String toString() => '($lhs | $rhs)';
 }
 
@@ -116,8 +106,6 @@ class Concatenation extends Composite {
   }
 
   @override
-  bool get isProductive => lhs.isProductive && rhs.isProductive;
-  @override
   String toString() => '($lhs ∘ $rhs)';
 }
 
@@ -128,9 +116,6 @@ class Delta extends Composite {
   O accept<I, O>(FunctionalVisitor<I, O> visitor, input) {
     return visitor.visitDelta(this, input);
   }
-
-  @override
-  bool get isProductive => operand.isProductive;
 
   @override
   String toString() => '(δ $operand)';
@@ -144,19 +129,6 @@ class Reference extends Composite {
   @override
   O accept<I, O>(FunctionalVisitor<I, O> visitor, input) {
     return visitor.visitReference(this, input);
-  }
-
-  bool? _isProductive;
-
-  @override
-  bool get isProductive => _isProductive ??= _computeIsProductive();
-  bool _computeIsProductive() {
-    //suppose false, before traversing children
-    _isProductive = false;
-    var result = target.isProductive;
-    //clear the cache
-    _isProductive = null;
-    return result;
   }
 
   @override
