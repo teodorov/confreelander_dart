@@ -2,13 +2,67 @@ import 'dart:collection';
 
 import 'stupid_languages.dart';
 
+class TaggedLink<D> {
+  TaggedLink(this.vertex1, this.vertex2);
+  Node<D> vertex1, vertex2;
+  bool destroyed = false;
+}
+
+class Node<D> {
+  Node(this.data);
+  D data;
+  List<TaggedLink<D>> incoming = [];
+  List<TaggedLink<D>> outgoing = [];
+  bool mark = false;
+}
+
+class DependencyGraph<D> {
+  Map<D, Node<D>> nodes = {};
+  List<D> predecessors(D data) {
+    Node<D>? node = nodes[data];
+    if (node == null) return [];
+    var alive = node.incoming.where((link) => !link.destroyed).toList();
+    node.incoming = alive;
+    return node.incoming
+        .map((e) => e.vertex1 == node ? e.vertex2.data : e.vertex1.data)
+        .toList();
+  }
+
+  void setSuccessors(D sourceData, List<D> successors) {
+    var sourceNode = nodes.putIfAbsent(sourceData, () => Node(sourceData));
+    List<Node<D>> targets = [];
+    for (var successor in successors) {
+      var targetNode = nodes.putIfAbsent(successor, () => Node(successor));
+      //do not add duplicates
+      if (targetNode.mark = true) continue;
+      targetNode.mark = true;
+      targets.add(targetNode);
+      var link = TaggedLink(sourceNode, targetNode);
+      sourceNode.outgoing.add(link);
+      targetNode.incoming.add(link);
+    }
+    //clear the marks
+    for (var t in targets) {
+      t.mark = false;
+    }
+  }
+
+  void clearSuccessors(D data) {
+    Node? node = nodes[data];
+    if (node == null) return;
+    for (var n in node.outgoing) {
+      n.destroyed = true;
+    }
+    node.outgoing = [];
+  }
+}
+
 class Fixer {
   Fixer(this.visitor);
   FunctionalVisitor<bool Function(Language), bool> visitor;
   Map<Language, bool?> fixed = HashMap.identity();
   Map<Language, bool?> transient = HashMap.identity();
-  Map<Language, List<Language>> parents = HashMap.identity();
-  Map<Language, List<Language>> children = HashMap.identity();
+  DependencyGraph<Language> graph = DependencyGraph();
   Queue<Language> workset = ListQueue();
 
   bool call(Language node) {
@@ -31,8 +85,6 @@ class Fixer {
       return;
     }
     transient[node] = false;
-    parents[node] = [];
-    children[node] = [];
     workset.add(node);
   }
 
@@ -48,20 +100,14 @@ class Fixer {
     }
 
     var newProperty = current.accept(visitor, isNullableF);
-    children[current] = currentChildren;
-    for (var child in currentChildren) {
-      parents.putIfAbsent(child, () => []).add(current);
-    }
+    graph.setSuccessors(current, currentChildren);
     if (transient[current] != newProperty) {
       transient[current] = newProperty;
       //signal the parents because the current language nullability changed
-      for (var observer in parents[current]!) {
-        // for (var child in children[observer]!) {
-        //   parents[child]!.remove(observer);
-        // }
-        children[observer] = [];
+      graph.predecessors(current).forEach((observer) {
+        graph.clearSuccessors(observer);
         workset.add(observer);
-      }
+      });
     }
   }
 }
