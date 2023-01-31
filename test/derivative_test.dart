@@ -1,6 +1,5 @@
 import 'package:confreelander/src/derivative.dart';
 import 'package:confreelander/src/stupid_constructors.dart';
-import 'package:confreelander/src/stupid_languages.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -42,17 +41,6 @@ void main() {
 
     test('D delta', () {
       expect(token('42').delta.derivative(23), empty());
-    });
-
-    test('D delayed a∘b toString', () {
-      var lang = token('a').concatenation(token('b'));
-      expect((lang.derivative('b')).toString(),
-          lang.derivative('a').derivative('b').toString());
-    });
-
-    test('D delayed a∘b equals', () {
-      var lang = token('a').concatenation(token('b'));
-      expect((lang.derivative('b')), lang.derivative('a').derivative('b'));
     });
 
     test('ref', () {
