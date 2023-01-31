@@ -36,7 +36,6 @@ extension SmartConstructors on Language {
 
   Language get delta {
     return isNullable ? eps() : empty();
-    // return this is Delta ? this : Delta(this);
   }
 
   Language ref(Object name) {
