@@ -1,8 +1,8 @@
 import 'dart:collection';
 
 import 'package:confreelander/src/nullability.dart';
-import 'package:confreelander/src/stupid_constructors.dart';
-import 'package:confreelander/src/stupid_languages.dart';
+import 'package:confreelander/src/constructors.dart';
+import 'package:confreelander/src/languages.dart';
 
 extension Derivative on Language {
   bool includes(Iterator it) {

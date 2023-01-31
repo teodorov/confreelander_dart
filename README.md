@@ -158,7 +158,24 @@ Y = (t)=> t ∈ {1, two} | Y
 
 ## Some numbers
 
-- 2023/01/29 - v1.0.0: NestedQuantifiers(RunTime): 0.09164101415936503 us.
+- 2023/01/29 empty & eps singletons
+  - 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+    - smart constructors 
+      - NestedQuantifiers(RunTime): 35.849948292226834 us.
+      - dart run benchmark/nested_quantifiers_benchmark.dart  4.94s user 0.20s system 103% cpu 4.965 total
+    - no smart constructors:
+      - killed: dart run benchmark/nested_quantifiers_benchmark.dart  1974.58s user 44.49s system 74% cpu 44:52.89 total
+  - 'aaaaaaaaaaaaaaaa'
+    - smart constructors
+      - NestedQuantifiers(RunTime): 29.618884667807325 us.
+      - dart run benchmark/nested_quantifiers_benchmark.dart  3.11s user 0.16s system 107% cpu 3.040 total
+
+    - no smart constructors:
+      - NestedQuantifiers(RunTime): 39.28468399731139 us. 
+      - dart run benchmark/nested_quantifiers_benchmark.dart  44.22s user 4.09s system 224% cpu 21.514 total
+
+
+- 2023/01/29 - v1.0.0: 'aaaaaaaaa' NestedQuantifiers(RunTime): 0.09164101415936503 us.
 
 ## References
 

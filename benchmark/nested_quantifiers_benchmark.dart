@@ -1,8 +1,8 @@
 import 'package:benchmark_harness/benchmark_harness.dart';
 import 'package:characters/characters.dart';
 import 'package:confreelander/src/derivative.dart';
-import 'package:confreelander/src/stupid_constructors.dart';
-import 'package:confreelander/src/stupid_languages.dart';
+import 'package:confreelander/src/constructors.dart';
+import 'package:confreelander/src/languages.dart';
 
 class NestedQuantifierBenchmark extends BenchmarkBase {
   NestedQuantifierBenchmark() : super('NestedQuantifiers');
@@ -33,7 +33,8 @@ class NestedQuantifierBenchmark extends BenchmarkBase {
     rA.target = pA;
     rG.target = pG;
 
-    iterator = it('aaaaaaaaa');
+    //iterator = it('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+    iterator = it('aaaaaaaaaaaaaaaa');
   }
 }
 

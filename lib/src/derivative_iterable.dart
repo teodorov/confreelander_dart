@@ -1,6 +1,6 @@
 import 'package:confreelander/src/derivative.dart';
 
-import 'stupid_languages.dart';
+import 'languages.dart';
 
 extension DerivativesAreIterable on Language {
   Iterable<Language> derivatives(Iterable<Object> it) {

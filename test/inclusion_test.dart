@@ -4,7 +4,7 @@ import "package:characters/characters.dart";
 import 'package:collection/collection.dart';
 import 'package:confreelander/src/language_to_tgf.dart';
 import 'package:confreelander/src/nullability.dart';
-import 'package:confreelander/src/stupid_constructors.dart';
+import 'package:confreelander/src/constructors.dart';
 import 'package:confreelander/src/derivative.dart';
 import 'package:confreelander/src/derivative_iterable.dart';
 import 'package:test/test.dart';

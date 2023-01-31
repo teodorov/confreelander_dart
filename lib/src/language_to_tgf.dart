@@ -1,6 +1,6 @@
 import 'dart:collection';
 
-import 'package:confreelander/src/stupid_languages.dart';
+import 'package:confreelander/src/languages.dart';
 
 extension Language2TGF on Language {
   toTGF() {

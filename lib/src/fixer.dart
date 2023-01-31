@@ -1,6 +1,6 @@
 import 'dart:collection';
 
-import 'stupid_languages.dart';
+import 'languages.dart';
 
 class Fixer {
   Fixer(this.visitor);

@@ -1,6 +1,6 @@
 import "package:characters/characters.dart";
 import 'package:confreelander/src/derivative.dart';
-import 'package:confreelander/src/stupid_constructors.dart';
+import 'package:confreelander/src/constructors.dart';
 import 'package:test/test.dart';
 
 void main() {

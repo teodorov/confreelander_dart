@@ -1,6 +1,6 @@
 import 'dart:collection';
 
-import 'package:confreelander/src/stupid_languages.dart';
+import 'package:confreelander/src/languages.dart';
 
 // ignore_for_file: avoid_renaming_method_parameters
 class IsEqual extends FunctionalVisitor<Object?, bool> {

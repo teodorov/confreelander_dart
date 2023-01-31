@@ -1,5 +1,5 @@
 import 'equality.dart';
-import 'stupid_constructors.dart';
+import 'constructors.dart';
 
 class FunctionalVisitor<I, O> {
   O visitLanguage(Language node, I input) =>
@@ -51,6 +51,9 @@ abstract class Terminal extends Language {
 }
 
 class Empty extends Terminal {
+  Empty._build();
+  static final Empty _instance = Empty._build();
+  factory Empty() => _instance;
   @override
   O accept<I, O>(FunctionalVisitor<I, O> visitor, input) {
     return visitor.visitEmpty(this, input);
@@ -61,6 +64,9 @@ class Empty extends Terminal {
 }
 
 class Epsilon extends Terminal {
+  Epsilon._build();
+  static final Epsilon _instance = Epsilon._build();
+  factory Epsilon() => _instance;
   @override
   O accept<I, O>(FunctionalVisitor<I, O> visitor, input) {
     return visitor.visitEpsilon(this, input);

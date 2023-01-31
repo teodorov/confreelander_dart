@@ -1,7 +1,7 @@
 // ignore_for_file: avoid_renaming_method_parameters
 
 import 'fixer.dart';
-import 'stupid_languages.dart';
+import 'languages.dart';
 
 extension Inhabited on Language {
   bool get isInhabited {

@@ -1,4 +1,4 @@
-import 'package:confreelander/src/stupid_languages.dart';
+import 'package:confreelander/src/languages.dart';
 
 import 'package:test/test.dart';
 
