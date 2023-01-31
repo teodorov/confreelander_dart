@@ -1,5 +1,6 @@
 import 'package:benchmark_harness/benchmark_harness.dart';
 import 'package:characters/characters.dart';
+import 'package:confreelander/src/derivative.dart';
 import 'package:confreelander/src/stupid_constructors.dart';
 import 'package:confreelander/src/stupid_languages.dart';
 
