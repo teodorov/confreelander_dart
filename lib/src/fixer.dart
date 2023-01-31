@@ -8,7 +8,6 @@ class Fixer {
   Map<Language, bool?> fixed = HashMap.identity();
   Map<Language, bool?> transient = HashMap.identity();
   Map<Language, List<Language>> parents = HashMap.identity();
-  Map<Language, List<Language>> children = HashMap.identity();
   Queue<Language> workset = ListQueue();
 
   bool call(Language node) {
@@ -32,7 +31,6 @@ class Fixer {
     }
     transient[node] = false;
     parents[node] = [];
-    children[node] = [];
     workset.add(node);
   }
 
@@ -48,7 +46,6 @@ class Fixer {
     }
 
     var newProperty = current.accept(visitor, isNullableF);
-    children[current] = currentChildren;
     for (var child in currentChildren) {
       parents.putIfAbsent(child, () => []).add(current);
     }
@@ -56,10 +53,6 @@ class Fixer {
       transient[current] = newProperty;
       //signal the parents because the current language nullability changed
       for (var observer in parents[current]!) {
-        // for (var child in children[observer]!) {
-        //   parents[child]!.remove(observer);
-        // }
-        children[observer] = [];
         workset.add(observer);
       }
     }
