@@ -7,6 +7,8 @@ extension Inhabited on Language {
   bool get isInhabited => Fixer(IsInhabited())(this);
 
   bool get isProductive => isInhabited;
+
+  bool get maybeInhabited => Fixer(MaybeInhabited())(this);
 }
 
 class IsInhabited extends FunctionalVisitor<bool Function(Language), bool> {
@@ -31,4 +33,10 @@ class IsInhabited extends FunctionalVisitor<bool Function(Language), bool> {
   @override
   bool visitReference(Reference node, bool Function(Language) isInhabitedF) =>
       isInhabitedF(node.target);
+}
+
+class MaybeInhabited extends IsInhabited {
+  @override
+  bool visitReference(Reference node, bool Function(Language p1) isInhabitedF) =>
+      node.target.isEmpty ? true : isInhabitedF(node.target);
 }
