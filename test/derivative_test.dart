@@ -6,16 +6,16 @@ import 'package:test/test.dart';
 void main() {
   group('derivative', () {
     test('D empty', () {
-      expect(identical(empty(), empty().derivative(23)), true);
+      expect(empty().derivative(23), empty());
     });
 
     test('D epsilon', () {
-      expect(identical(eps().derivative(23), empty()), true);
+      expect(eps().derivative(23), empty());
     });
 
     test('D token', () {
-      expect(identical(token(23).derivative(42), empty()), true);
-      expect(token(23).derivative(23), isA<Epsilon>());
+      expect(token(23).derivative(42), empty());
+      expect(token(23).derivative(23), eps());
     });
 
     test('D union', () {
@@ -41,7 +41,7 @@ void main() {
     });
 
     test('D delta', () {
-      expect(identical(token('42').delta.derivative(23), empty()), true);
+      expect(token('42').delta.derivative(23), empty());
     });
 
     test('D delayed a∘b toString', () {
@@ -74,8 +74,10 @@ void main() {
       var S = token('a') | rS;
       rS.target = S;
 
-      S.derivative('a');
-      expect(S.derivative('a'), eps() | (token('a') | rS));
+      var rT = ref('X');
+      var X = eps() | rT;
+      rT.target = X;
+      expect(S.derivative('a'), X);
     });
 
     test('S = a | S =a=> =a=>', () {
@@ -83,8 +85,10 @@ void main() {
       var S = token('a') | rS;
       rS.target = S;
 
-      expect(S.derivative('a').derivative('a'),
-          empty() | (eps() | (token('a') | rS)));
+      var rT = ref('X');
+      var X = empty() | rT;
+      rT.target = X;
+      expect(S.derivative('a').derivative('a'), X);
     });
 
     test('self loop', () {

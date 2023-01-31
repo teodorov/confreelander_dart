@@ -1,3 +1,4 @@
+import 'equality.dart';
 import 'stupid_constructors.dart';
 
 class FunctionalVisitor<I, O> {
@@ -32,6 +33,12 @@ abstract class Language {
   }
 
   get isEmpty => this == empty();
+
+  @override
+  bool operator ==(Object? other) => accept(IsEqual(), other);
+
+  @override
+  int get hashCode => accept(HashCode(), null);
 }
 
 /// a Terminal parser does not contain sub-parsers
