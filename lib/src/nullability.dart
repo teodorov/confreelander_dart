@@ -1,7 +1,5 @@
 // ignore_for_file: avoid_renaming_method_parameters
 
-import 'dart:collection';
-
 import 'package:confreelander/src/stupid_languages.dart';
 
 import 'fixer.dart';

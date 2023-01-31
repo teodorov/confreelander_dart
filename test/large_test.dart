@@ -5,10 +5,6 @@ import 'package:test/test.dart';
 
 void main() {
   group('inclusion', () {
-    rit(String a) {
-      return a.runes.iterator;
-    }
-
     it(String a) {
       return a.characters.iterator;
     }
