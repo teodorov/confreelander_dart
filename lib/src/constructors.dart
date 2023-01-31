@@ -32,7 +32,7 @@ extension SmartConstructors on Language {
     return concatenation(other);
   }
 
-  Language get delta => Delta(this);
+  Language get delta => this is Delta ? this : Delta(this);
 
   Language ref(Object name) {
     if (isEmpty) return empty();
