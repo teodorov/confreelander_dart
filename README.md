@@ -72,7 +72,7 @@ D (τ o)     t ≜ ∅, where o ≠ c
 D (L₁ | L₂) t ≜ (D L₁ t) | (D L₂ t)
 D (L₁ ∘ L₂) t ≜ (Δ L₁) ∘ (D L₂ t) | (D L₁ t) ∘ L₂
 D (Δ L)     t ≜ ∅
-D (μ _₁ L)  t ≜ μ _₂ (D o t)
+D (μ n L)  t ≜ μ n (D o t)
 
 isNullable ∅         ≜ ⊥
 isNullable ϵ         ≜ ⊤

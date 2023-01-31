@@ -45,7 +45,7 @@ class LanguageDerivative extends FunctionalVisitor<Object, Language> {
     var refDerivative = referenceDerivativeCache[node];
     if (refDerivative != null) return refDerivative;
     //the derivative is an empty reference
-    refDerivative = referenceDerivativeCache[node] = ref(Object());
+    refDerivative = referenceDerivativeCache[node] = ref(node.name);
     //compute the derivative of the target
     refDerivative.target = derivative(node.target, input);
     return refDerivative;
