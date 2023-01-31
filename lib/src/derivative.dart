@@ -11,9 +11,7 @@ extension Derivative on Language {
     return der.includes(it);
   }
 
-  Language derivative(token) {
-    return accept(LanguageDerivative(), token);
-  }
+  Language derivative(token) => accept(LanguageDerivative(), token);
 }
 
 class LanguageDerivative extends FunctionalVisitor<Object, Language> {

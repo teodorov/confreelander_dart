@@ -4,9 +4,7 @@ import 'fixer.dart';
 import 'languages.dart';
 
 extension Inhabited on Language {
-  bool get isInhabited {
-    return Fixer(IsInhabited())(this);
-  }
+  bool get isInhabited => Fixer(IsInhabited())(this);
 
   bool get isProductive => isInhabited;
 }
