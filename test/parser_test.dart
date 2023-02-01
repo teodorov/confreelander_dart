@@ -15,7 +15,7 @@ void main() {
       var word = 'a'.characters;
       expect(s.includes(word), true);
       var parseTree = s.parse(word);
-      print('-'*10 + s.toString());
+      // print('-'*10 + s.toString());
       expect('$parseTree', '{a}');
     });
 
@@ -24,14 +24,14 @@ void main() {
       var word = 'a'.characters;
       expect(s.includes(word), true);
       var parseTree = s.parse(word);
-      print('-'*10 + s.toString());
+      // print('-'*10 + s.toString());
       // print(parseTree);
       expect('$parseTree', '{a}');
 
       word = 'b'.characters;
       expect(s.includes(word), true);
       parseTree = s.parse(word);
-      print('-'*10 + s.toString());
+      // print('-'*10 + s.toString());
       // print(parseTree);
       expect('$parseTree', '{b}');
     });
@@ -41,7 +41,7 @@ void main() {
       var word = 'a'.characters;
       expect(s.includes(word), true);
       var parseTree = s.parse(word);
-      print('-'*10 + s.toString());
+      // print('-'*10 + s.toString());
       // print(parseTree);
       expect('$parseTree', '{a}');
     });
@@ -51,7 +51,7 @@ void main() {
       var word = 'ab'.characters;
       expect(s.includes(word), true);
       var parseTree = s.parse(word);
-      print('-' * 10 + s.toString());
+      // print('-' * 10 + s.toString());
       // print(parseTree);
       expect('$parseTree', '{[a, b]}');
     });
