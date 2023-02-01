@@ -5,7 +5,7 @@ import 'package:confreelander/src/languages.dart';
 import 'fixer.dart';
 
 extension Nullable on Language {
-  bool get isNullable => Fixer(IsNullable())(this);
+  bool get isNullable => Fixer(IsNullable(), booleanLattice)(this);
 }
 
 class IsNullable extends FunctionalVisitor<bool Function(Language), bool> {

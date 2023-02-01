@@ -6,11 +6,11 @@ import 'fixer.dart';
 import 'languages.dart';
 
 extension Inhabited on Language {
-  bool get isInhabited => Fixer(IsInhabited())(this);
+  bool get isInhabited => Fixer(IsInhabited(), booleanLattice)(this);
 
   bool get isProductive => isInhabited;
 
-  bool get maybeInhabited => Fixer(MaybeInhabited())(this);
+  bool get maybeInhabited => Fixer(MaybeInhabited(), booleanLattice)(this);
 }
 
 class IsInhabited extends FunctionalVisitor<bool Function(Language), bool> {
