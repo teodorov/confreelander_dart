@@ -38,5 +38,5 @@ integer
 	;
 
 WS
-   : [ \t\n\r] + -> skip
+   : [ \t\n\r]+ -> skip
    ;
