@@ -5,10 +5,12 @@ import 'package:confreelander/src/constructors.dart';
 import 'package:confreelander/src/languages.dart';
 
 extension Derivative on Language {
-  bool includes(Iterator it) {
-    if (!it.moveNext()) return isNullable;
-    var der = derivative(it.current);
-    return der.includes(it);
+  bool includes(Iterable iterable) {
+    var current = this;
+    for (var token in iterable) {
+      current = current.derivative(token);
+    }
+    return current.isNullable;
   }
 
   Language derivative(token) => accept(LanguageDerivative(), token);

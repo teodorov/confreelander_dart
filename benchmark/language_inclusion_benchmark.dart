@@ -12,7 +12,7 @@ class LanguageInclusionBenchmark extends BenchmarkBase {
   // The benchmark code.
   @override
   void run() {
-    language.includes(word.characters.iterator);
+    language.includes(word.characters);
   }
 }
 

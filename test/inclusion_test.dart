@@ -12,7 +12,7 @@ import 'package:test/test.dart';
 void main() {
   group('inclusion', () {
     it(String a) {
-      return a.characters.iterator;
+      return a.characters;
     }
 
     test('self reference X = X, (d X a)', () {
@@ -47,7 +47,7 @@ void main() {
       var x = eps() | token('a').seq(rx);
       rx.target = x;
 
-      expect(x.includes(Iterable.empty().iterator), true);
+      expect(x.includes(Iterable.empty()), true);
       expect(x.includes(it('a')), true);
       expect(x.includes(it('aa')), true);
       expect(x.includes(it('ba')), false);

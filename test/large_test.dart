@@ -6,7 +6,7 @@ import 'package:test/test.dart';
 void main() {
   group('inclusion', () {
     it(String a) {
-      return a.characters.iterator;
+      return a.characters;
     }
 
     ///There exists an exponential number of different ways for (a*|b)* to match all the 'a's.
