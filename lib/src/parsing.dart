@@ -1,7 +1,5 @@
 // ignore_for_file: avoid_renaming_method_parameters
 
-import 'dart:collection';
-
 import 'package:collection/collection.dart';
 import 'package:confreelander/confreelander.dart';
 import 'package:confreelander/src/derivative.dart';
