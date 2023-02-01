@@ -56,7 +56,7 @@ void main() {
       expect('$parseTree', '{[a, b]}');
     });
 
-    test('S = S (t +) S | (t a)', () {
+    test('S = S ((t +) S) | (t a) -- a+a', () {
       var rS = ref('S');
       var s = rS.seq(token('+').seq(rS)) | token('a');
       rS.target = s;
@@ -68,7 +68,19 @@ void main() {
       expect('$parseTree', '{[a, [+, a]]}');
     });
 
-    test('S = S (t +) S | (t a)', () {
+    test('S = S ((t +) S) | (t a) -- a+a+a', () {
+      var rS = ref('S');
+      var s = rS.seq(token('+').seq(rS)) | token('a');
+      rS.target = s;
+
+      var word = 'a+a+a'.characters;
+      expect(s.includes(word), true);
+      var parseTree = s.parse(word);
+      // print(parseTree);
+      expect('$parseTree', '{[a, [+, [a, [+, a]]]], [[a, [+, a]], [+, a]]}');
+    });
+
+    test('S = (S (t +)) S | (t a) -- a+a', () {
       var rS = ref('S');
       var s = rS.seq(token('+')).seq(rS) | token('a');
       rS.target = s;
@@ -78,6 +90,18 @@ void main() {
       var parseTree = s.parse(word);
       // print(parseTree);
       expect('$parseTree', '{[[a, +], a]}');
+    });
+
+    test('S = (S (t +)) S | (t a) -- a+a+a', () {
+      var rS = ref('S');
+      var s = rS.seq(token('+')).seq(rS) | token('a');
+      rS.target = s;
+
+      var word = 'a+a+a'.characters;
+      expect(s.includes(word), true);
+      var parseTree = s.parse(word);
+      // print(parseTree);
+      expect('$parseTree', '{[[a, +], [[a, +], a]], [[[[a, +], a], +], a]}');
     });
   });
 }
