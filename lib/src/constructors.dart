@@ -35,7 +35,11 @@ extension SmartConstructors on Language {
   }
 
   Language get delta {
-    return isNullable ? eps() : empty();
+    /// For recognition there is no need for the delta node.
+    // return isNullable ? eps() : empty();
+    /// Delta cannot be simplified to eps() when parsing, we need the tokens associated
+    // Δ Δ p          = Δ p
+    return (this is Delta) ? this : Delta(this);
   }
 
   Language ref(Object name) {
