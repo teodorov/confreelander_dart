@@ -24,9 +24,28 @@ extension DerivativeParsing on Language {
     }
     return {};
   }
+  ParserDerivative parserDerivative(Object token) {
+    var derivativeVisitor = ParsingDerivative();
+    var languageDerivative = accept(derivativeVisitor, token);
+    return ParserDerivative(languageDerivative, derivativeVisitor.epsilonParseTrees);
+  }
+}
+
+class ParserDerivative {
+  ParserDerivative(this.language, this.epsilonParseTrees);
+  Language language;
+  Expando<Set> epsilonParseTrees;
+
+  ParserDerivative parserDerivative(Object token) {
+    var derivativeVisitor = ParsingDerivative.withParseTree(epsilonParseTrees);
+    var languageDerivative = language.accept(derivativeVisitor, token);
+    return ParserDerivative(languageDerivative, epsilonParseTrees);
+  }
 }
 
 class ParsingDerivative extends LanguageDerivative {
+  ParsingDerivative();
+  ParsingDerivative.withParseTree(this.epsilonParseTrees);
   Expando<Set> epsilonParseTrees = Expando('epsilonParseTrees');
   @override
   Language visitToken(Token node, Object input) {
