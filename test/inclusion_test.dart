@@ -127,7 +127,6 @@ void main() {
     });
 
     test('X = a | X, (d X a)', () {
-      print('\n-----(d X a)----\n');
       var rx = ref('x');
       var x = token('a') | rx;
       rx.target = x;
@@ -139,7 +138,6 @@ void main() {
     });
 
     test('X = a | X, (d X b)', () {
-      print('\n-----(d X b)----\n');
       var rx = ref('x');
       var x = token('a') | rx;
       rx.target = x;
@@ -151,7 +149,6 @@ void main() {
     });
 
     test('X = a | X, (d (d X a) a)', () {
-      print('\n-----(d (d X a) a)----\n');
       var rx = ref('x');
       var x = token('a') | rx;
       rx.target = x;
@@ -163,7 +160,6 @@ void main() {
     });
 
     test('X = a | X, (d (d X b) a)', () {
-      print('\n-----(d (d X b) a)----\n');
       var rx = ref('x');
       var x = token('a') | rx;
       rx.target = x;
@@ -175,7 +171,6 @@ void main() {
     });
 
     test('X = a | X, (d (d X a) b)', () {
-      print('\n-----(d (d X a) b)----\n');
       var rx = ref('x');
       var x = token('a') | rx;
       rx.target = x;
@@ -187,7 +182,6 @@ void main() {
     });
 
     test('X = a | X, (d (d (d X a) a) a)', () {
-      print('\n-----(d (d (d X a) a) a)----\n');
       var rx = ref('x');
       var x = token('a') | rx;
       rx.target = x;
@@ -199,7 +193,6 @@ void main() {
     });
 
     test('X = a | X, (d (d (d X b) a) a)', () {
-      print('\n-----(d (d (d X b) a) a)----\n');
       var rx = ref('x');
       var x = token('a') | rx;
       rx.target = x;
@@ -211,7 +204,6 @@ void main() {
     });
 
     test('X = a | X, (d (d (d X a) b) a)', () {
-      print('\n-----(d (d (d X a) b) a)----\n');
       var rx = ref('x');
       var x = token('a') | rx;
       rx.target = x;
@@ -223,7 +215,6 @@ void main() {
     });
 
     test('X = a | X, (d (d (d X a) a) b)', () {
-      print('\n-----(d (d (d X a) a) b)----\n');
       var rx = ref('x');
       var x = token('a') | rx;
       rx.target = x;

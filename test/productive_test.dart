@@ -133,7 +133,7 @@ void main() {
       expect(rS.derivative('a').isProductive, false);
     });
 
-    test('two refs isProductive', () {
+    test('two refs isProductive 1', () {
       var rA = ref('A');
       var l = rA | token('x');
       rA.target = l;
@@ -145,7 +145,7 @@ void main() {
       expect(l1.isProductive, true);
     });
 
-    test('two refs isProductive', () {
+    test('two refs isProductive 2', () {
       var rA = ref('A');
       var l = rA | token('x');
       rA.target = l;
