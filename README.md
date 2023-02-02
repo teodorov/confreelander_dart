@@ -125,6 +125,23 @@ p**            = p*
 
 ## Recognition vs Parsing
 
+### Epsilon
+
+For recognition the `Epsilon` can and should be singleton.
+For parsing that is not possible, since the tokens are attached to the Epsilon nodes.
+
+The `Epsilon` constructor should not be private.
+
+To attach the tokens to the Epsilon nodes two solutions possible:
+
+1. Expando, which acts as an identity dictionary but with weak references to the keys. If the key is no longer referenced the key-value is GCed.
+   - needs to accumulate mappings across derivatives and to be passed to the parse tree builder.
+2. Subclass Epsilon -- see `epsilon_parsing_subclass` branch.
+
+The same Epsilon instance can be reused for each derivative, since all of them have the same token associated.
+
+### Delta
+
 For recognition, we do not *strictly* need ```Delta``` nodes. They accumulate without adding utility. If for homogeneity we use a ```delta``` constructor the it should use the following equality:
 
 ```scala
@@ -144,6 +161,9 @@ Nevertheless, there is no need to accumulate Δ nodes as the following equality 
 ```scala
 Δ Δ L = Δ L
 ```
+
+To try: For parsing, another possibility might be to build the parseTree on each isNullable check and attach it in the
+ϵ node. This way Δ nodes are again not needed.
 
 ## Some things to note
 
