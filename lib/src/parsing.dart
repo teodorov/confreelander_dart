@@ -19,33 +19,53 @@ extension DerivativeParsing on Language {
       current = current.accept(derivativeVisitor, token);
     }
     if (current.isNullable) {
-      return Fixer(ParseTreeVisitor(derivativeVisitor.epsilonParseTrees),
-          setLattice)(current);
+      return Fixer(ParseTreeBuilder(), setLattice)(current);
     }
     return {};
   }
 }
 
-class ParsingDerivative extends LanguageDerivative {
-  Expando<Set> epsilonParseTrees = Expando('epsilonParseTrees');
+class EpsilonParser extends Epsilon {
+  EpsilonParser(token) : super.newInstance() {
+    parseTrees.add(token);
+  }
+  Set parseTrees = {};
+
   @override
-  Language visitToken(Token node, Object input) {
-    if (node.token != input) return empty();
-    var derivative = eps();
-    epsilonParseTrees[derivative] = {node.token};
-    return derivative;
+  O accept<I, O>(FunctionalVisitor<I, O> visitor, input) {
+    if (visitor is ParserFunctionalVisitor) {
+      return (visitor as ParserFunctionalVisitor)
+          .visitEpsilonParser(this, input);
+    }
+    return visitor.visitEpsilon(this, input);
   }
 }
 
-class ParseTreeVisitor extends FunctionalVisitor<Set Function(Language), Set> {
-  ParseTreeVisitor(this.epsilonParseTrees);
-  Expando<Set> epsilonParseTrees;
+class ParserFunctionalVisitor<I, O> extends FunctionalVisitor<I, O> {
+  O visitEpsilonParser(EpsilonParser node, I input) {
+    throw UnimplementedError('missing visitor method');
+  }
+}
+
+class ParsingDerivative extends LanguageDerivative {
+  @override
+  Language visitToken(Token node, Object input) =>
+      node.token == input ? EpsilonParser(node.token) : empty();
+}
+
+class ParseTreeBuilder
+    extends ParserFunctionalVisitor<Set Function(Language), Set> {
   @override
   Set visitEmpty(Empty node, Set Function(Language) parseTreeF) => {};
 
   @override
   Set visitEpsilon(Epsilon node, Set Function(Language) parseTreeF) =>
-      epsilonParseTrees[node] ?? {};
+      throw Exception('should not use for parsing');
+
+  @override
+  Set visitEpsilonParser(
+          EpsilonParser node, Set Function(Language) parseTreeF) =>
+      node.parseTrees;
 
   @override
   Set visitToken(Token node, Set Function(Language) parseTreeF) => {};

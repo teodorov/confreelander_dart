@@ -123,6 +123,28 @@ p**            = p*
 3. Memoization for all composite nodes
    1. let's start by doing it first where it is really needed only.
 
+## Recognition vs Parsing
+
+For recognition, we do not *strictly* need ```Delta``` nodes. They accumulate without adding utility. If for homogeneity we use a ```delta``` constructor the it should use the following equality:
+
+```scala
+Δ L = ϵ, where L.isNullable
+Δ L = ∅, otherwise
+```
+
+One valid question would be then:
+
+- Does the nullability computation cost more time than the space saved from not using Δ nodes ?
+  - At the end isNullable has to evaluate the Δ nodes anyway.
+  - Checking for nullability during derivation might seem cheaper, but at the same time since the derivative of delta is empty, at the end we might get fewer deltas than we get during the derivation.
+
+For parsing the Δ nodes are necessary since they protect the tokens associated with the ϵ nodes of its operand.
+Nevertheless, there is no need to accumulate Δ nodes as the following equality holds:
+
+```scala
+Δ Δ L = Δ L
+```
+
 ## Some things to note
 
 1. The reference name should not be used in the structural equality
