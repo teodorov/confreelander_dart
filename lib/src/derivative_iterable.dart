@@ -2,6 +2,12 @@ import 'package:confreelander/src/derivative.dart';
 
 import 'languages.dart';
 
+///
+///```dart
+/// x.derivatives('aaaaa'.characters).forEachIndexed((index, dpT) {
+///  File('dX$index.tgf').writeAsStringSync(dpT.toTGF());
+///});
+///```
 extension DerivativesAreIterable on Language {
   Iterable<Language> derivatives(Iterable<Object> it) {
     return DerivativeIterable(this, it);

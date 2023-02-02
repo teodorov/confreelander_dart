@@ -1,12 +1,7 @@
-import 'dart:io';
-
 import "package:characters/characters.dart";
-import 'package:collection/collection.dart';
-import 'package:confreelander/src/language_to_tgf.dart';
 import 'package:confreelander/src/nullability.dart';
 import 'package:confreelander/src/constructors.dart';
 import 'package:confreelander/src/derivative.dart';
-import 'package:confreelander/src/derivative_iterable.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -30,10 +25,6 @@ void main() {
       var rx = ref('x');
       var x = rx.seq(token('a'));
       rx.target = x;
-
-      x.derivatives('aaaaa'.characters).forEachIndexed((index, dpT) {
-        File('dX$index.tgf').writeAsStringSync(dpT.toTGF());
-      });
 
       expect(rx.includes(it('')), false);
       expect(rx.includes(it('a')), false);
@@ -66,7 +57,6 @@ void main() {
       var x = eps() | rx.seq(token('a'));
       rx.target = x;
 
-      File('epsinXa.tgf').writeAsStringSync(x.toTGF());
       expect(x.includes(it('')), true);
     });
 
@@ -74,8 +64,6 @@ void main() {
       var rx = ref('x');
       var x = eps() | rx.seq(token('a'));
       rx.target = x;
-
-      File('ainXa.tgf').writeAsStringSync(x.derivative('a').toTGF());
 
       expect(x.includes(it('a')), true);
     });
@@ -85,8 +73,6 @@ void main() {
       var x = eps() | rx.seq(token('a'));
       rx.target = x;
 
-      File('aainXa.tgf')
-          .writeAsStringSync(x.derivative('a').derivative('a').toTGF());
       expect(x.includes(it('aa')), true);
     });
 
@@ -95,8 +81,8 @@ void main() {
       var x = eps() | rx.seq(token('a'));
       rx.target = x;
 
-      File('abinXa.tgf')
-          .writeAsStringSync(x.derivative('a').derivative('b').toTGF());
+      // File('abinXa.tgf')
+      //     .writeAsStringSync(x.derivative('a').derivative('b').toTGF());
       expect(x.includes(it('ab')), false);
     });
 
@@ -105,8 +91,6 @@ void main() {
       var x = eps() | rx.seq(token('a'));
       rx.target = x;
 
-      File('bainXa.tgf')
-          .writeAsStringSync(x.derivative('b').derivative('a').toTGF());
       expect(x.includes(it('ba')), false);
     });
 
@@ -114,9 +98,6 @@ void main() {
       var rx = ref('x');
       var x = eps() | rx.seq(token('a'));
       rx.target = x;
-
-      File('aaainXa.tgf').writeAsStringSync(
-          x.derivative('a').derivative('a').derivative('a').toTGF());
 
       expect(x.includes(it('aaa')), true);
     });
@@ -126,9 +107,6 @@ void main() {
       var x = eps() | rx.seq(token('a'));
       rx.target = x;
 
-      File('aabinXa.tgf').writeAsStringSync(
-          x.derivative('a').derivative('a').derivative('b').toTGF());
-
       expect(x.includes(it('aab')), false);
     });
 
@@ -137,9 +115,6 @@ void main() {
       var x = eps() | rx.seq(token('a'));
       rx.target = x;
 
-      File('abainXa.tgf').writeAsStringSync(
-          x.derivative('a').derivative('b').derivative('a').toTGF());
-
       expect(x.includes(it('aba')), false);
     });
 
@@ -147,12 +122,7 @@ void main() {
       var rx = ref('x');
       var x = eps() | rx.seq(token('a'));
       rx.target = x;
-      File('aaaainXa.tgf').writeAsStringSync(x
-          .derivative('a')
-          .derivative('a')
-          .derivative('a')
-          .derivative('a')
-          .toTGF());
+
       expect(x.includes(it('aaaa')), true);
     });
 
@@ -161,7 +131,6 @@ void main() {
       var rx = ref('x');
       var x = token('a') | rx;
       rx.target = x;
-      File('dXa.tgf').writeAsStringSync(x.derivative('a').toTGF());
 
       rx = ref('x');
       x = token('a') | rx;
@@ -174,7 +143,6 @@ void main() {
       var rx = ref('x');
       var x = token('a') | rx;
       rx.target = x;
-      File('dXb.tgf').writeAsStringSync(x.derivative('b').toTGF());
 
       rx = ref('x');
       x = token('a') | rx;
@@ -187,8 +155,6 @@ void main() {
       var rx = ref('x');
       var x = token('a') | rx;
       rx.target = x;
-      File('ddXaa.tgf')
-          .writeAsStringSync(x.derivative('a').derivative('a').toTGF());
 
       rx = ref('x');
       x = token('a') | rx;
@@ -201,8 +167,6 @@ void main() {
       var rx = ref('x');
       var x = token('a') | rx;
       rx.target = x;
-      File('ddXba.tgf')
-          .writeAsStringSync(x.derivative('b').derivative('a').toTGF());
 
       rx = ref('x');
       x = token('a') | rx;
@@ -215,8 +179,6 @@ void main() {
       var rx = ref('x');
       var x = token('a') | rx;
       rx.target = x;
-      File('ddXab.tgf')
-          .writeAsStringSync(x.derivative('a').derivative('b').toTGF());
 
       rx = ref('x');
       x = token('a') | rx;
@@ -229,8 +191,6 @@ void main() {
       var rx = ref('x');
       var x = token('a') | rx;
       rx.target = x;
-      File('dddXaaa.tgf').writeAsStringSync(
-          x.derivative('a').derivative('a').derivative('a').toTGF());
 
       rx = ref('x');
       x = token('a') | rx;
@@ -243,8 +203,6 @@ void main() {
       var rx = ref('x');
       var x = token('a') | rx;
       rx.target = x;
-      File('dddXbaa.tgf').writeAsStringSync(
-          x.derivative('b').derivative('a').derivative('a').toTGF());
 
       rx = ref('x');
       x = token('a') | rx;
@@ -257,8 +215,6 @@ void main() {
       var rx = ref('x');
       var x = token('a') | rx;
       rx.target = x;
-      File('dddXaba.tgf').writeAsStringSync(
-          x.derivative('a').derivative('b').derivative('a').toTGF());
 
       rx = ref('x');
       x = token('a') | rx;
@@ -271,8 +227,6 @@ void main() {
       var rx = ref('x');
       var x = token('a') | rx;
       rx.target = x;
-      File('dddXaab.tgf').writeAsStringSync(
-          x.derivative('a').derivative('a').derivative('b').toTGF());
 
       rx = ref('x');
       x = token('a') | rx;
@@ -307,8 +261,6 @@ void main() {
       var rx = ref('x');
       var x = rx.seq(token('a')) | eps();
       rx.target = x;
-
-      File('xae.tgf').writeAsStringSync(x.toTGF());
 
       expect(x.includes(it('')), true);
       expect(x.includes(it('a')), true);
@@ -386,7 +338,7 @@ void main() {
       expect(s.includes(it('[[]]')), true);
       expect(s.includes(it('[[]')), false);
       expect(s.includes(it('[[]][]')), true);
-      // expect(s.includes(it('[[]][][[[][]]]')), true);
+      expect(s.includes(it('[[]][][[[][]]]')), true);
     });
 
     test('well-formed parens 1', () {
@@ -403,7 +355,7 @@ void main() {
       expect(s.includes(it('[[]]')), true);
       expect(s.includes(it('[[]')), false);
       expect(s.includes(it('[[]][]')), true);
-      // expect(s.includes(it('[[]][][[[][]]]')), true);
+      expect(s.includes(it('[[]][][[[][]]]')), true);
     });
 
     test('mutually right recursive abab...', () {
@@ -416,8 +368,6 @@ void main() {
 
       expect(a.includes(it('')), true);
 
-      File('abab.tgf')
-          .writeAsStringSync(a.derivative('a').derivative('b').toTGF());
       expect(a.derivative('a').isNullable, false);
       expect(a.derivative('a').derivative('b').isNullable, true);
 
@@ -445,13 +395,6 @@ void main() {
 
       expect(a.includes(it('')), true);
       expect(a.includes(it('ba')), true);
-
-      File('baba.tgf').writeAsStringSync(a
-          .derivative('b')
-          .derivative('a')
-          .derivative('b')
-          .derivative('a')
-          .toTGF());
 
       expect(a.includes(it('baba')), true);
       expect(a.includes(it('bababa')), true);
@@ -487,9 +430,6 @@ void main() {
       rE.target = e;
       rS.target = s;
 
-      print('\n-----(d E e)----\n');
-      File('dEe.tgf').writeAsStringSync(e.derivative('e').toTGF());
-
       expect(e.includes(it('e')), true);
     });
 
@@ -500,10 +440,6 @@ void main() {
       var s = token('s') | rE;
       rE.target = e;
       rS.target = s;
-
-      print('\n-----(d (d E e) s)----\n');
-      File('ddEes.tgf')
-          .writeAsStringSync(e.derivative('e').derivative('s').toTGF());
 
       rE = ref('E');
       rS = ref('S');
@@ -521,10 +457,6 @@ void main() {
       var s = token('s') | rE;
       rE.target = e;
       rS.target = s;
-
-      print('\n-----(d (d E e) e)----\n');
-      File('ddEee.tgf')
-          .writeAsStringSync(e.derivative('e').derivative('e').toTGF());
 
       expect(e.includes(it('ee')), false);
     });

@@ -1,6 +1,3 @@
-import 'dart:io';
-
-import 'package:confreelander/src/language_to_tgf.dart';
 import 'package:confreelander/src/nullability.dart';
 import 'package:confreelander/src/constructors.dart';
 import 'package:confreelander/src/derivative.dart';
@@ -173,8 +170,6 @@ void main() {
       rB.target = b;
       rC.target = c;
 
-      File('sabc.tgf').writeAsStringSync(c.toTGF());
-
       expect(s.isNullable, true);
       expect(c.isNullable, true);
     });
@@ -193,8 +188,6 @@ void main() {
       rB.target = b;
       rC.target = c;
 
-      File('sabc.tgf').writeAsStringSync(c.toTGF());
-
       expect(s.isNullable, true);
       expect(c.isNullable, true);
     });
@@ -207,8 +200,6 @@ void main() {
       rA.target = a;
       rC.target = c;
 
-      File('ac.tgf').writeAsStringSync(c.toTGF());
-
       expect(a.isNullable, true);
       expect(c.isNullable, true);
     });
@@ -220,8 +211,6 @@ void main() {
       var c = rA;
       rA.target = a;
       rC.target = c;
-
-      File('ac.tgf').writeAsStringSync(c.toTGF());
 
       expect(a.isNullable, true);
       expect(rA.isNullable, true);
@@ -238,8 +227,6 @@ void main() {
       rS.target = rA;
       rA.target = a;
       rC.target = c;
-
-      File('sac.tgf').writeAsStringSync(rS.toTGF());
 
       expect(rS.isNullable, true);
       expect(a.isNullable, true);
