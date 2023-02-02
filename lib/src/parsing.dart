@@ -31,7 +31,7 @@ class ParsingDerivative extends LanguageDerivative {
   @override
   Language visitToken(Token node, Object input) {
     if (node.token != input) return empty();
-    var derivative = eps();
+    var derivative = Epsilon.newInstance();
     epsilonParseTrees[derivative] = {node.token};
     return derivative;
   }

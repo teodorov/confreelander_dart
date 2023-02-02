@@ -1,8 +1,42 @@
+import 'package:confreelander/src/constructors.dart';
 import 'package:confreelander/src/languages.dart';
 
 import 'package:test/test.dart';
 
 void main() {
+  group('singletons', () {
+    test('empty builder singleton', () {
+      expect(identical(empty(), empty()), true);
+    });
+
+    test('Empty singleton', () {
+      expect(identical(Empty(), Empty()), true);
+    });
+
+    test('Empty empty singleton', () {
+      expect(identical(Empty(), empty()), true);
+    });
+
+    test('Epsilon singleton', () {
+      expect(identical(Epsilon(), Epsilon()), true);
+    });
+
+    test('Epsilon builder singleton', () {
+      expect(identical(eps(), eps()), true);
+    });
+
+    test('Epsilon.newInstance not singleton', () {
+      expect(identical(Epsilon.newInstance(), Epsilon.newInstance()), false);
+    });
+
+    test('Epsilon.newInstance different eps', () {
+      expect(identical(Epsilon.newInstance(), eps()), false);
+    });
+
+    test('Epsilon.newInstance different Epsilon', () {
+      expect(identical(Epsilon.newInstance(), Epsilon()), false);
+    });
+  });
   group('printing', () {
     setUp(() {
       // Additional setup goes here.

@@ -64,10 +64,12 @@ class Empty extends Terminal {
 }
 
 class Epsilon extends Terminal {
-  /// Epsilon cannot be singleton for parsing.
-  // Epsilon._build();
-  // static final Epsilon _instance = Epsilon._build();
-  // factory Epsilon() => _instance;
+  static final Epsilon _instance = Epsilon.newInstance();
+  factory Epsilon() => _instance;
+
+  /// Epsilon cannot be singleton for parsing,
+  /// so allow subclasses to create new instances
+  Epsilon.newInstance();
 
   @override
   O accept<I, O>(FunctionalVisitor<I, O> visitor, input) {
