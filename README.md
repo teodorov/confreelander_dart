@@ -203,6 +203,13 @@ Y = (t)=> t ∈ {1, two} | Y
 
 ## Some numbers
 
+- 2023/02/06
+  - smart constructors
+    - Language Inclusion nested quantifiers  50 ko (RunTime): 139308.06666666668 us.
+    - Language Inclusion nested quantifiers 100 ko (RunTime): 1067806.0 us.
+    - Language Inclusion nested quantifiers 200 ko (RunTime): 8981605.5 us.
+    - Language Inclusion nested quantifiers 300 ko (RunTime): 30887382.0 us.
+    - Language Inclusion nested quantifiers  50 ok (RunTime): 173676.15384615384 us.
 - 2023/01/29 empty & eps singletons
   - 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
     - smart constructors 
