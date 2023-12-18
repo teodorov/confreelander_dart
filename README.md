@@ -233,3 +233,7 @@ Y = (t)=> t ∈ {1, two} | Y
 
 <a id="1">[1]</a>
 Matthew Might, David Darais, and Daniel Spiewak. "Parsing with derivatives: a functional pearl." Acm sigplan notices 46, no. 9 (2011): 189-195.
+
+<a id="2">[2]</a> Peter Thiemann. Partial Derivatives for Context-Free Languages: From μ-Regular Expressions to Pushdown Automata
+
+We extend **Antimirov**'s **partial derivatives** from regular expressions to μ-regular expressions that describe context-free languages. We prove the correctness of partial derivatives as well as the finiteness of the set of iterated partial derivatives. The latter are used as pushdown symbols in our construction of a nondeterministic pushdown automaton, which generalizes Antimirov's NFA construction.
